@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <AssemblyName>Paraminter.CSharp.Attributes.Constructor.Phrike</AssemblyName>
+        
+        <PackageId>Paraminter.CSharp.Attributes.Constructor.Phrike</PackageId>
+        <Description>Provides general implementations of services related to a Paraminter associator specialized in syntactic C# attribute constructor arguments.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Paraminter.Associators.Queries" />
+        <PackageReference Include="Paraminter.CSharp.Attributes.Constructor.Common.Queries.Collectors" />
+        <PackageReference Include="Paraminter.Queries.Handlers" />
+        <PackageReference Include="Paraminter.Queries.Values.Collectors" />
+
+        <ProjectReference Include="$(SolutionDir)\src\Queries\Queries.csproj" />
+    </ItemGroup>
+
+</Project>
