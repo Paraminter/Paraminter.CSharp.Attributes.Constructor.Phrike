@@ -32,7 +32,7 @@ public sealed class Handle
     [Fact]
     public void NullQueryResponseCollector_ThrowsArgumentNullException()
     {
-        var result = Record.Exception(() => Target(Mock.Of<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>>(), null!));
+        var result = Record.Exception(() => Target(Mock.Of<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>>(), null!));
 
         Assert.IsType<ArgumentNullException>(result);
     }
@@ -46,7 +46,7 @@ public sealed class Handle
         parameter1SymbolMock.Setup(static (symbol) => symbol.Name).Returns("Foo");
         parameter2SymbolMock.Setup(static (symbol) => symbol.Name).Returns("Foo");
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup(static (query) => query.Data.Parameters).Returns([parameter1SymbolMock.Object, parameter2SymbolMock.Object]);
@@ -66,7 +66,7 @@ public sealed class Handle
         parameterSymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(false);
         parameterSymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(false);
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup(static (query) => query.Data.Parameters).Returns([parameterSymbolMock.Object]);
@@ -96,7 +96,7 @@ public sealed class Handle
         parameter2SymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(true);
         parameter2SymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(false);
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup(static (query) => query.Data.Parameters).Returns([parameter1SymbolMock.Object, parameter2SymbolMock.Object]);
@@ -126,7 +126,7 @@ public sealed class Handle
         parameter2SymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(true);
         parameter2SymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(false);
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup(static (query) => query.Data.Parameters).Returns([parameter1SymbolMock.Object, parameter2SymbolMock.Object]);
@@ -148,7 +148,7 @@ public sealed class Handle
 
         parameterSymbolMock.Setup(static (symbol) => symbol.Name).Returns("Foo");
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup(static (query) => query.Data.Parameters).Returns([parameterSymbolMock.Object]);
@@ -174,7 +174,7 @@ public sealed class Handle
         parameterSymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(false);
         parameterSymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(true);
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup(static (query) => query.Data.Parameters).Returns([parameterSymbolMock.Object]);
@@ -204,7 +204,7 @@ public sealed class Handle
         parameterSymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(false);
         parameterSymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(true);
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup(static (query) => query.Data.Parameters).Returns([parameterSymbolMock.Object]);
@@ -248,7 +248,7 @@ public sealed class Handle
         parameter2SymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(true);
         parameter2SymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(false);
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup(static (query) => query.Data.Parameters).Returns([parameter1SymbolMock.Object, parameter2SymbolMock.Object]);
@@ -279,7 +279,7 @@ public sealed class Handle
         parameterSymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(false);
         parameterSymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(false);
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup(static (query) => query.Data.Parameters).Returns([parameterSymbolMock.Object]);
@@ -305,7 +305,7 @@ public sealed class Handle
         parameterSymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(false);
         parameterSymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(true);
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup(static (query) => query.Data.Parameters).Returns([parameterSymbolMock.Object]);
@@ -337,7 +337,7 @@ public sealed class Handle
         parameterSymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(false);
         parameterSymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(true);
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup(static (query) => query.Data.Parameters).Returns([parameterSymbolMock.Object]);
@@ -369,7 +369,7 @@ public sealed class Handle
         parameterSymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(false);
         parameterSymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(true);
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup(static (query) => query.Data.Parameters).Returns([parameterSymbolMock.Object]);
@@ -408,7 +408,7 @@ public sealed class Handle
         parameterSymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(false);
         parameterSymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(true);
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup(static (query) => query.Data.Parameters).Returns([parameterSymbolMock.Object]);
@@ -433,7 +433,7 @@ public sealed class Handle
     }
 
     private void Target(
-        IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData> query,
+        IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData> query,
         IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector queryResponseCollector)
     {
         Fixture.Sut.Handle(query, queryResponseCollector);

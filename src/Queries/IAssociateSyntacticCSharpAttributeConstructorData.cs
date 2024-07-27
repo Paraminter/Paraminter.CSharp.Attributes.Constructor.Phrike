@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 
 /// <summary>Represents data used to associate syntactic C# attribute constructor arguments.</summary>
-public interface IUnassociatedSyntacticCSharpAttributeConstructorInvocationData
+public interface IAssociateSyntacticCSharpAttributeConstructorData
 {
     /// <summary>The attribute constructor parameters.</summary>
     public abstract IReadOnlyList<IParameterSymbol> Parameters { get; }

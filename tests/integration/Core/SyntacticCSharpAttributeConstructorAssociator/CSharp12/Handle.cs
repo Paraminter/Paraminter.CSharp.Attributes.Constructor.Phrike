@@ -43,7 +43,7 @@ public sealed class Handle
         var attributeSyntax = syntaxTree.GetRoot().DescendantNodes().OfType<AttributeSyntax>().Single();
         var syntacticArguments = attributeSyntax.ArgumentList!.Arguments;
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup((query) => query.Data.Parameters).Returns(parameters);
@@ -87,7 +87,7 @@ public sealed class Handle
         var attributeSyntax = syntaxTree.GetRoot().DescendantNodes().OfType<AttributeSyntax>().Single();
         var syntacticArguments = attributeSyntax.ArgumentList!.Arguments;
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup((query) => query.Data.Parameters).Returns(parameters);
@@ -124,7 +124,7 @@ public sealed class Handle
         var type = compilation.GetTypeByMetadataName("Foo")!;
         var parameters = type.GetAttributes()[0].AttributeConstructor!.Parameters;
 
-        Mock<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>> queryMock = new();
+        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
         Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup((query) => query.Data.Parameters).Returns(parameters);
@@ -142,7 +142,7 @@ public sealed class Handle
     }
 
     private void Target(
-        IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData> query,
+        IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData> query,
         IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector queryResponseCollector)
     {
         Fixture.Sut.Handle(query, queryResponseCollector);

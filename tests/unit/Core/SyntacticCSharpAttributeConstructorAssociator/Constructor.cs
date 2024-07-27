@@ -28,9 +28,9 @@ public sealed class Constructor
         Assert.NotNull(result);
     }
 
-    private static SyntacticCSharpAttributeConstructorInvocationDataAssociator Target(
+    private static SyntacticCSharpAttributeConstructorAssociator Target(
         IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>> paramsArgumentIdentifier)
     {
-        return new SyntacticCSharpAttributeConstructorInvocationDataAssociator(paramsArgumentIdentifier);
+        return new SyntacticCSharpAttributeConstructorAssociator(paramsArgumentIdentifier);
     }
 }
