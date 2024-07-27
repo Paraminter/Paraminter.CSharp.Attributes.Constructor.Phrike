@@ -15,7 +15,7 @@ internal static class FixtureFactory
     {
         Mock<IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>>> paramsArgumentIdentifierMock = new();
 
-        SyntacticCSharpAttributeConstructorInvocationDataAssociator sut = new(paramsArgumentIdentifierMock.Object);
+        SyntacticCSharpAttributeConstructorAssociator sut = new(paramsArgumentIdentifierMock.Object);
 
         return new Fixture(sut, paramsArgumentIdentifierMock);
     }
@@ -23,12 +23,12 @@ internal static class FixtureFactory
     private sealed class Fixture
         : IFixture
     {
-        private readonly IQueryHandler<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>, IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> Sut;
+        private readonly IQueryHandler<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>, IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> Sut;
 
         private readonly Mock<IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>>> ParamsArgumentIdentifierMock;
 
         public Fixture(
-            IQueryHandler<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>, IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> sut,
+            IQueryHandler<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>, IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> sut,
             Mock<IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>>> paramsArgumentIdentifierMock)
         {
             Sut = sut;
@@ -36,7 +36,7 @@ internal static class FixtureFactory
             ParamsArgumentIdentifierMock = paramsArgumentIdentifierMock;
         }
 
-        IQueryHandler<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>, IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> IFixture.Sut => Sut;
+        IQueryHandler<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>, IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> IFixture.Sut => Sut;
 
         Mock<IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>>> IFixture.ParamsArgumentIdentifierMock => ParamsArgumentIdentifierMock;
     }

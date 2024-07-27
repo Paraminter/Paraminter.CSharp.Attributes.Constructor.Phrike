@@ -10,7 +10,7 @@ using Paraminter.Queries.Values.Collectors;
 
 internal interface IFixture
 {
-    public abstract IQueryHandler<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>, IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> Sut { get; }
+    public abstract IQueryHandler<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>, IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector> Sut { get; }
 
     public abstract Mock<IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>>> ParamsArgumentIdentifierMock { get; }
 }

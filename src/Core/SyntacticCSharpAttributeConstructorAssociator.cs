@@ -15,21 +15,21 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>Associates syntactic C# attribute constructor arguments.</summary>
-public sealed class SyntacticCSharpAttributeConstructorInvocationDataAssociator
-    : IQueryHandler<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>, IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector>
+public sealed class SyntacticCSharpAttributeConstructorAssociator
+    : IQueryHandler<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>, IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector>
 {
     private readonly IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>> ParamsArgumentIdentifier;
 
-    /// <summary>Instantiates a <see cref="SyntacticCSharpAttributeConstructorInvocationDataAssociator"/>, associating syntactic C# attribute constructor arguments.</summary>
+    /// <summary>Instantiates a <see cref="SyntacticCSharpAttributeConstructorAssociator"/>, associating syntactic C# attribute constructor arguments.</summary>
     /// <param name="paramsArgumentIdentifier">Identifies <see langword="params"/> arguments.</param>
-    public SyntacticCSharpAttributeConstructorInvocationDataAssociator(
+    public SyntacticCSharpAttributeConstructorAssociator(
         IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>> paramsArgumentIdentifier)
     {
         ParamsArgumentIdentifier = paramsArgumentIdentifier ?? throw new ArgumentNullException(nameof(paramsArgumentIdentifier));
     }
 
-    void IQueryHandler<IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData>, IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector>.Handle(
-        IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData> query,
+    void IQueryHandler<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>, IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector>.Handle(
+        IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData> query,
         IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector queryResponseCollector)
     {
         if (query is null)
@@ -49,7 +49,7 @@ public sealed class SyntacticCSharpAttributeConstructorInvocationDataAssociator
     {
         public static void Associate(
             IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>> isArgumentParamsQueryHandler,
-            IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData> query,
+            IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData> query,
             IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector queryResponseCollector)
         {
             var associator = new Associator(isArgumentParamsQueryHandler, query, queryResponseCollector);
@@ -59,7 +59,7 @@ public sealed class SyntacticCSharpAttributeConstructorInvocationDataAssociator
 
         private readonly IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>> IsArgumentParamsQueryHandler;
 
-        private readonly IUnassociatedSyntacticCSharpAttributeConstructorInvocationData UnassociatedInvocationData;
+        private readonly IAssociateSyntacticCSharpAttributeConstructorData UnassociatedInvocationData;
         private readonly IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector QueryResponseCollector;
 
         private readonly IDictionary<string, IParameterSymbol> UnparsedParametersByName;
@@ -71,7 +71,7 @@ public sealed class SyntacticCSharpAttributeConstructorInvocationDataAssociator
 
         private Associator(
             IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>> isArgumentParamsQueryHandler,
-            IAssociateArgumentsQuery<IUnassociatedSyntacticCSharpAttributeConstructorInvocationData> query,
+            IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData> query,
             IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector queryResponseCollector)
         {
             IsArgumentParamsQueryHandler = isArgumentParamsQueryHandler;
