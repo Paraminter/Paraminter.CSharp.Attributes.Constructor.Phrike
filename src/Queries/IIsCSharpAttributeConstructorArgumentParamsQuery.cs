@@ -9,12 +9,12 @@ using Paraminter.Queries;
 public interface IIsCSharpAttributeConstructorArgumentParamsQuery
     : IQuery
 {
-    /// <summary>The associated attribute constructor parameter.</summary>
+    /// <summary>The attribute constructor parameter.</summary>
     public abstract IParameterSymbol Parameter { get; }
 
-    /// <summary>The syntactic description of the attribute constructor argument.</summary>
+    /// <summary>The syntactic C# attribute constructor argument.</summary>
     public abstract AttributeArgumentSyntax SyntacticArgument { get; }
 
-    /// <summary>A semantic model containing the invocation.</summary>
+    /// <summary>A semantic model describing the syntactic argument.</summary>
     public abstract SemanticModel SemanticModel { get; }
 }
