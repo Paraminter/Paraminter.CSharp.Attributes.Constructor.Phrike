@@ -153,12 +153,14 @@ public sealed class Handle
         var attributeSyntax = (AttributeSyntax)attribute.ApplicationSyntaxReference!.GetSyntax();
         var syntacticArgument = attributeSyntax.ArgumentList!.Arguments[0];
 
+        var semanticModel = compilation.GetSemanticModel(attributeSyntax.SyntaxTree);
+
         Mock<IIsCSharpAttributeConstructorArgumentParamsQuery> queryMock = new();
         Mock<IValuedQueryResponseCollector<bool>> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
         queryMock.Setup(static (query) => query.Parameter).Returns(parameter);
         queryMock.Setup(static (query) => query.SyntacticArgument).Returns(syntacticArgument);
-        queryMock.Setup(static (query) => query.SemanticModel).Returns(compilation.GetSemanticModel(attributeSyntax.SyntaxTree));
+        queryMock.Setup(static (query) => query.SemanticModel).Returns(semanticModel);
 
         Target(queryMock.Object, queryResponseCollectorMock.Object);
 

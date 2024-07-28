@@ -1,7 +1,6 @@
 ﻿namespace Paraminter.CSharp.Attributes.Constructor.Phrike;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Moq;
@@ -10,6 +9,7 @@ using Paraminter.CSharp.Attributes.Constructor.Phrike.Queries;
 using Paraminter.Queries.Values.Collectors;
 
 using System;
+using System.Linq;
 
 using Xunit;
 
@@ -116,25 +116,22 @@ public sealed class Handle
         string source,
         bool expected)
     {
-        CSharpParseOptions parseOptions = new(languageVersion: LanguageVersion.CSharp12);
+        var compilation = CompilationFactory.Create(source);
 
-        var syntaxTree = CSharpSyntaxTree.ParseText(source, parseOptions);
+        var type = compilation.GetTypeByMetadataName("Foo")!;
+        var parameters = type.GetAttributes()[0].AttributeConstructor!.Parameters;
 
-        var compilation = CSharpCompilation.Create("TestAssembly", options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)).AddSyntaxTrees(syntaxTree);
+        var syntaxTree = compilation.SyntaxTrees[0];
         var semanticModel = compilation.GetSemanticModel(syntaxTree);
 
-        var attribute = compilation.GetTypeByMetadataName("Foo")!.GetAttributes()[0];
-
-        var parameter = attribute.AttributeConstructor!.Parameters[0];
-
-        var attributeSyntax = (AttributeSyntax)attribute.ApplicationSyntaxReference!.GetSyntax();
-        var syntacticArgument = attributeSyntax.ArgumentList!.Arguments[0];
+        var attributeSyntax = syntaxTree.GetRoot().DescendantNodes().OfType<AttributeSyntax>().Single();
+        var syntacticArguments = attributeSyntax.ArgumentList!.Arguments;
 
         Mock<IIsCSharpAttributeConstructorArgumentParamsQuery> queryMock = new();
         Mock<IValuedQueryResponseCollector<bool>> queryResponseCollectorMock = new() { DefaultValue = DefaultValue.Mock };
 
-        queryMock.Setup(static (query) => query.Parameter).Returns(parameter);
-        queryMock.Setup(static (query) => query.SyntacticArgument).Returns(syntacticArgument);
+        queryMock.Setup(static (query) => query.Parameter).Returns(parameters[0]);
+        queryMock.Setup(static (query) => query.SyntacticArgument).Returns(syntacticArguments[0]);
         queryMock.Setup(static (query) => query.SemanticModel).Returns(semanticModel);
 
         Target(queryMock.Object, queryResponseCollectorMock.Object);

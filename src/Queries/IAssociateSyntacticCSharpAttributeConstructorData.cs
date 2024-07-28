@@ -11,9 +11,9 @@ public interface IAssociateSyntacticCSharpAttributeConstructorData
     /// <summary>The attribute constructor parameters.</summary>
     public abstract IReadOnlyList<IParameterSymbol> Parameters { get; }
 
-    /// <summary>The syntactic attribute constructor arguments, possibly also containing syntactic named constructor arguments.</summary>
+    /// <summary>The syntactic C# attribute constructor arguments, possibly also containing syntactic C# named attribute arguments.</summary>
     public abstract IReadOnlyList<AttributeArgumentSyntax> SyntacticArguments { get; }
 
-    /// <summary>A semantic model describing the syntactic attribute constructor arguments.</summary>
+    /// <summary>A semantic model describing the syntactic arguments.</summary>
     public abstract SemanticModel SemanticModel { get; }
 }

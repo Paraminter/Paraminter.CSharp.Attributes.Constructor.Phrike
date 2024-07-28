@@ -48,16 +48,16 @@ public sealed class SyntacticCSharpAttributeConstructorAssociator
     private sealed class Associator
     {
         public static void Associate(
-            IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>> isArgumentParamsQueryHandler,
+            IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>> paramsArgumentIdentifier,
             IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData> query,
             IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector queryResponseCollector)
         {
-            var associator = new Associator(isArgumentParamsQueryHandler, query, queryResponseCollector);
+            var associator = new Associator(paramsArgumentIdentifier, query, queryResponseCollector);
 
             associator.Associate();
         }
 
-        private readonly IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>> IsArgumentParamsQueryHandler;
+        private readonly IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>> ParamsArgumentIdentifier;
 
         private readonly IAssociateSyntacticCSharpAttributeConstructorData UnassociatedInvocationData;
         private readonly IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector QueryResponseCollector;
@@ -70,11 +70,11 @@ public sealed class SyntacticCSharpAttributeConstructorAssociator
         private bool HasEncounteredError;
 
         private Associator(
-            IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>> isArgumentParamsQueryHandler,
+            IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>> paramsArgumentIdentifier,
             IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData> query,
             IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseCollector queryResponseCollector)
         {
-            IsArgumentParamsQueryHandler = isArgumentParamsQueryHandler;
+            ParamsArgumentIdentifier = paramsArgumentIdentifier;
             UnassociatedInvocationData = query.Data;
             QueryResponseCollector = queryResponseCollector;
 
@@ -279,7 +279,7 @@ public sealed class SyntacticCSharpAttributeConstructorAssociator
             var query = new IsCSharpAttributeConstructorArgumentParamsQuery(UnassociatedInvocationData.Parameters[index], UnassociatedInvocationData.SyntacticArguments[index], UnassociatedInvocationData.SemanticModel);
             var queryResponseCollector = new ValuedQueryResponseCollector<bool>();
 
-            IsArgumentParamsQueryHandler.Handle(query, queryResponseCollector);
+            ParamsArgumentIdentifier.Handle(query, queryResponseCollector);
 
             if (queryResponseCollector.HasSetValue is false)
             {
