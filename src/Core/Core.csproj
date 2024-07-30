@@ -9,9 +9,8 @@
 
     <ItemGroup>
         <PackageReference Include="Paraminter.Associators.Queries" />
-        <PackageReference Include="Paraminter.CSharp.Attributes.Constructor.Common.Queries.Collectors" />
-        <PackageReference Include="Paraminter.Queries.Handlers" />
-        <PackageReference Include="Paraminter.Queries.Values.Collectors" />
+        <PackageReference Include="Paraminter.CSharp.Attributes.Constructor.Common.Queries.Handlers" />
+        <PackageReference Include="Paraminter.Queries.Values.Handlers" />
 
         <ProjectReference Include="$(SolutionDir)\src\Queries\Queries.csproj" />
     </ItemGroup>

@@ -4,7 +4,7 @@ using Moq;
 
 using Paraminter.CSharp.Attributes.Constructor.Phrike.Queries;
 using Paraminter.Queries.Handlers;
-using Paraminter.Queries.Values.Collectors;
+using Paraminter.Queries.Values.Handlers;
 
 using System;
 
@@ -23,13 +23,13 @@ public sealed class Constructor
     [Fact]
     public void ValidArguments_ReturnsAssociator()
     {
-        var result = Target(Mock.Of<IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>>>());
+        var result = Target(Mock.Of<IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseHandler<bool>>>());
 
         Assert.NotNull(result);
     }
 
     private static SyntacticCSharpAttributeConstructorAssociator Target(
-        IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseCollector<bool>> paramsArgumentIdentifier)
+        IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseHandler<bool>> paramsArgumentIdentifier)
     {
         return new SyntacticCSharpAttributeConstructorAssociator(paramsArgumentIdentifier);
     }
