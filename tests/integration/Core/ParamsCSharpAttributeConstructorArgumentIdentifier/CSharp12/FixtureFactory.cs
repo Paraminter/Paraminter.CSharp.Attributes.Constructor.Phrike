@@ -2,7 +2,6 @@
 
 using Paraminter.CSharp.Attributes.Constructor.Phrike.Queries;
 using Paraminter.Queries.Handlers;
-using Paraminter.Queries.Values.Handlers;
 
 internal static class FixtureFactory
 {
@@ -16,14 +15,14 @@ internal static class FixtureFactory
     private sealed class Fixture
         : IFixture
     {
-        private readonly IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseHandler<bool>> Sut;
+        private readonly IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool> Sut;
 
         public Fixture(
-            IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseHandler<bool>> sut)
+            IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool> sut)
         {
             Sut = sut;
         }
 
-        IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, IValuedQueryResponseHandler<bool>> IFixture.Sut => Sut;
+        IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool> IFixture.Sut => Sut;
     }
 }
