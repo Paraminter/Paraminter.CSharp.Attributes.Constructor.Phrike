@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <AssemblyName>Paraminter.CSharp.Attributes.Constructor.Phrike.Models</AssemblyName>
+
+        <RootNamespace>Paraminter.CSharp.Attributes.Constructor.Phrike.Models</RootNamespace>
+        
+        <PackageId>Paraminter.CSharp.Attributes.Constructor.Phrike.Models</PackageId>
+        <Description>Defines models for a Paraminter associator of syntactic C# attribute constructor arguments.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+
+        <PackageReference Include="Paraminter.Associators.Models" />
+    </ItemGroup>
+
+</Project>

@@ -5,11 +5,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Moq;
 
-using Paraminter.Associators.Queries;
-using Paraminter.CSharp.Attributes.Constructor.Commands;
-using Paraminter.CSharp.Attributes.Constructor.Phrike.Queries;
-using Paraminter.CSharp.Attributes.Constructor.Queries.Handlers;
-using Paraminter.Queries.Invalidation.Commands;
+using Paraminter.Arguments.CSharp.Attributes.Constructor.Models;
+using Paraminter.Associators.Commands;
+using Paraminter.Commands.Handlers;
+using Paraminter.CSharp.Attributes.Constructor.Phrike.Models;
+using Paraminter.Parameters.Method.Models;
 
 using System;
 using System.Collections.Generic;
@@ -23,7 +23,7 @@ public sealed class Handle
     private readonly IFixture Fixture = FixtureFactory.Create();
 
     [Fact]
-    public void AttributeUsage_NormalArguments_AssociatesAll()
+    public void AttributeUsage_NormalArguments_RecordsAll()
     {
         var source = """
             using System;
@@ -47,27 +47,26 @@ public sealed class Handle
         var attributeSyntax = syntaxTree.GetRoot().DescendantNodes().OfType<AttributeSyntax>().Single();
         var syntacticArguments = attributeSyntax.ArgumentList!.Arguments;
 
-        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
-        Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseHandler> queryResponseHandlerMock = new() { DefaultValue = DefaultValue.Mock };
+        Mock<IAssociateArgumentsCommand<IAssociateSyntacticCSharpAttributeConstructorData>> commandMock = new();
 
-        queryMock.Setup((query) => query.Data.Parameters).Returns(parameters);
-        queryMock.Setup((query) => query.Data.SyntacticArguments).Returns(syntacticArguments);
+        commandMock.Setup(static (command) => command.Data.Parameters).Returns(parameters);
+        commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
 
-        Target(queryMock.Object, queryResponseHandlerMock.Object);
+        Target(commandMock.Object);
 
-        queryResponseHandlerMock.Verify(NormalAssociationExpression(parameters[0], syntacticArguments[0]), Times.Once());
-        queryResponseHandlerMock.Verify(NormalAssociationExpression(parameters[1], syntacticArguments[1]), Times.Once());
-        queryResponseHandlerMock.Verify(NormalAssociationExpression(parameters[2], syntacticArguments[2]), Times.Once());
-        queryResponseHandlerMock.Verify(static (handler) => handler.AssociationCollector.Normal.Handle(It.IsAny<IAddNormalCSharpAttributeConstructorAssociationCommand>()), Times.Exactly(3));
+        Fixture.InvalidatorMock.Verify(static (invalidator) => invalidator.Handle(It.IsAny<IInvalidateArgumentAssociationsRecordCommand>()), Times.Never());
 
-        queryResponseHandlerMock.Verify(static (handler) => handler.AssociationCollector.Params.Handle(It.IsAny<IAddParamsCSharpAttributeConstructorAssociationCommand>()), Times.Never());
-        queryResponseHandlerMock.Verify(static (handler) => handler.AssociationCollector.Default.Handle(It.IsAny<IAddDefaultCSharpAttributeConstructorCommand>()), Times.Never());
+        Fixture.NormalRecorderMock.Verify(RecordNormalExpression(parameters[0], syntacticArguments[0]), Times.Once());
+        Fixture.NormalRecorderMock.Verify(RecordNormalExpression(parameters[1], syntacticArguments[1]), Times.Once());
+        Fixture.NormalRecorderMock.Verify(RecordNormalExpression(parameters[2], syntacticArguments[2]), Times.Once());
+        Fixture.NormalRecorderMock.Verify(static (recorder) => recorder.Handle(It.IsAny<IRecordArgumentAssociationCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>()), Times.Exactly(3));
 
-        queryResponseHandlerMock.Verify(static (handler) => handler.Invalidator.Handle(It.IsAny<IInvalidateQueryResponseCommand>()), Times.Never());
+        Fixture.ParamsRecorderMock.Verify(static (recorder) => recorder.Handle(It.IsAny<IRecordArgumentAssociationCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>()), Times.Never());
+        Fixture.DefaultRecorderMock.Verify(static (recorder) => recorder.Handle(It.IsAny<IRecordArgumentAssociationCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>()), Times.Never());
     }
 
     [Fact]
-    public void AttributeUsage_ParamsArguments_AssociatesAll()
+    public void AttributeUsage_ParamsArguments_RecordsAll()
     {
         var source = """
             using System;
@@ -91,25 +90,24 @@ public sealed class Handle
         var attributeSyntax = syntaxTree.GetRoot().DescendantNodes().OfType<AttributeSyntax>().Single();
         var syntacticArguments = attributeSyntax.ArgumentList!.Arguments;
 
-        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
-        Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseHandler> queryResponseHandlerMock = new() { DefaultValue = DefaultValue.Mock };
+        Mock<IAssociateArgumentsCommand<IAssociateSyntacticCSharpAttributeConstructorData>> commandMock = new();
 
-        queryMock.Setup((query) => query.Data.Parameters).Returns(parameters);
-        queryMock.Setup((query) => query.Data.SyntacticArguments).Returns(syntacticArguments);
+        commandMock.Setup(static (command) => command.Data.Parameters).Returns(parameters);
+        commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
 
-        Target(queryMock.Object, queryResponseHandlerMock.Object);
+        Target(commandMock.Object);
 
-        queryResponseHandlerMock.Verify(ParamsAssociationExpression(parameters[0], syntacticArguments), Times.Once());
-        queryResponseHandlerMock.Verify(static (handler) => handler.AssociationCollector.Params.Handle(It.IsAny<IAddParamsCSharpAttributeConstructorAssociationCommand>()), Times.Exactly(1));
+        Fixture.InvalidatorMock.Verify(static (invalidator) => invalidator.Handle(It.IsAny<IInvalidateArgumentAssociationsRecordCommand>()), Times.Never());
 
-        queryResponseHandlerMock.Verify(static (handler) => handler.AssociationCollector.Normal.Handle(It.IsAny<IAddNormalCSharpAttributeConstructorAssociationCommand>()), Times.Never());
-        queryResponseHandlerMock.Verify(static (handler) => handler.AssociationCollector.Default.Handle(It.IsAny<IAddDefaultCSharpAttributeConstructorCommand>()), Times.Never());
+        Fixture.ParamsRecorderMock.Verify(RecordParamsExpression(parameters[0], syntacticArguments), Times.Once());
+        Fixture.ParamsRecorderMock.Verify(static (recorder) => recorder.Handle(It.IsAny<IRecordArgumentAssociationCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>()), Times.Exactly(1));
 
-        queryResponseHandlerMock.Verify(static (handler) => handler.Invalidator.Handle(It.IsAny<IInvalidateQueryResponseCommand>()), Times.Never());
+        Fixture.NormalRecorderMock.Verify(static (recorder) => recorder.Handle(It.IsAny<IRecordArgumentAssociationCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>()), Times.Never());
+        Fixture.DefaultRecorderMock.Verify(static (recorder) => recorder.Handle(It.IsAny<IRecordArgumentAssociationCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>()), Times.Never());
     }
 
     [Fact]
-    public void AttributeUsage_DefaultArgument_AssociatesAll()
+    public void AttributeUsage_DefaultArgument_RecordsAll()
     {
         var source = """
             using System;
@@ -128,67 +126,86 @@ public sealed class Handle
         var type = compilation.GetTypeByMetadataName("Foo")!;
         var parameters = type.GetAttributes()[0].AttributeConstructor!.Parameters;
 
-        Mock<IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData>> queryMock = new();
-        Mock<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseHandler> queryResponseHandlerMock = new() { DefaultValue = DefaultValue.Mock };
+        Mock<IAssociateArgumentsCommand<IAssociateSyntacticCSharpAttributeConstructorData>> commandMock = new();
 
-        queryMock.Setup((query) => query.Data.Parameters).Returns(parameters);
-        queryMock.Setup((query) => query.Data.SyntacticArguments).Returns([]);
+        commandMock.Setup((query) => query.Data.Parameters).Returns(parameters);
+        commandMock.Setup((query) => query.Data.SyntacticArguments).Returns([]);
 
-        Target(queryMock.Object, queryResponseHandlerMock.Object);
+        Target(commandMock.Object);
 
-        queryResponseHandlerMock.Verify(DefaultAssociationExpression(parameters[0]), Times.Once());
-        queryResponseHandlerMock.Verify(static (handler) => handler.AssociationCollector.Default.Handle(It.IsAny<IAddDefaultCSharpAttributeConstructorCommand>()), Times.Exactly(1));
+        Fixture.InvalidatorMock.Verify(static (invalidator) => invalidator.Handle(It.IsAny<IInvalidateArgumentAssociationsRecordCommand>()), Times.Never());
 
-        queryResponseHandlerMock.Verify(static (handler) => handler.AssociationCollector.Normal.Handle(It.IsAny<IAddNormalCSharpAttributeConstructorAssociationCommand>()), Times.Never());
-        queryResponseHandlerMock.Verify(static (handler) => handler.AssociationCollector.Params.Handle(It.IsAny<IAddParamsCSharpAttributeConstructorAssociationCommand>()), Times.Never());
+        Fixture.DefaultRecorderMock.Verify(RecordDefaultExpression(parameters[0]), Times.Once());
+        Fixture.DefaultRecorderMock.Verify(static (recorder) => recorder.Handle(It.IsAny<IRecordArgumentAssociationCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>()), Times.Exactly(1));
 
-        queryResponseHandlerMock.Verify(static (handler) => handler.Invalidator.Handle(It.IsAny<IInvalidateQueryResponseCommand>()), Times.Never());
+        Fixture.NormalRecorderMock.Verify(static (recorder) => recorder.Handle(It.IsAny<IRecordArgumentAssociationCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>()), Times.Never());
+        Fixture.ParamsRecorderMock.Verify(static (recorder) => recorder.Handle(It.IsAny<IRecordArgumentAssociationCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>()), Times.Never());
     }
 
-    private static Expression<Action<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseHandler>> NormalAssociationExpression(
-        IParameterSymbol parameter,
+    private static Expression<Action<ICommandHandler<IRecordArgumentAssociationCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>>> RecordNormalExpression(
+        IParameterSymbol parameterSymbol,
         AttributeArgumentSyntax syntacticArgument)
     {
-        return (handler) => handler.AssociationCollector.Normal.Handle(It.Is(MatchNormalAssociationCommand(parameter, syntacticArgument)));
+        return (recorder) => recorder.Handle(It.Is(MatchRecordNormalCommand(parameterSymbol, syntacticArgument)));
     }
 
-    private static Expression<Func<IAddNormalCSharpAttributeConstructorAssociationCommand, bool>> MatchNormalAssociationCommand(
-        IParameterSymbol parameter,
+    private static Expression<Func<IRecordArgumentAssociationCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>, bool>> MatchRecordNormalCommand(
+        IParameterSymbol parameterSymbol,
         AttributeArgumentSyntax syntacticArgument)
     {
-        return (command) => ReferenceEquals(command.Parameter, parameter) && ReferenceEquals(command.SyntacticArgument, syntacticArgument);
+        return (command) => MatchParameter(parameterSymbol, command.Parameter) && MatchNormalArgumentData(syntacticArgument, command.ArgumentData);
     }
 
-    private static Expression<Action<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseHandler>> ParamsAssociationExpression(
-        IParameterSymbol parameter,
+    private static Expression<Action<ICommandHandler<IRecordArgumentAssociationCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>>> RecordParamsExpression(
+        IParameterSymbol parameterSymbol,
         IReadOnlyList<AttributeArgumentSyntax> syntacticArguments)
     {
-        return (handler) => handler.AssociationCollector.Params.Handle(It.Is(MatchParamsAssociationCommand(parameter, syntacticArguments)));
+        return (recorder) => recorder.Handle(It.Is(MatchRecordParamsCommand(parameterSymbol, syntacticArguments)));
     }
 
-    private static Expression<Func<IAddParamsCSharpAttributeConstructorAssociationCommand, bool>> MatchParamsAssociationCommand(
-        IParameterSymbol parameter,
+    private static Expression<Func<IRecordArgumentAssociationCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>, bool>> MatchRecordParamsCommand(
+        IParameterSymbol parameterSymbol,
         IReadOnlyList<AttributeArgumentSyntax> syntacticArguments)
     {
-        return (command) => ReferenceEquals(command.Parameter, parameter) && Enumerable.SequenceEqual(command.SyntacticArguments, syntacticArguments);
+        return (command) => MatchParameter(parameterSymbol, command.Parameter) && MatchParamsArgumentData(syntacticArguments, command.ArgumentData);
     }
 
-    private static Expression<Action<IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseHandler>> DefaultAssociationExpression(
-        IParameterSymbol parameter)
+    private static Expression<Action<ICommandHandler<IRecordArgumentAssociationCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>>> RecordDefaultExpression(
+        IParameterSymbol parameterSymbol)
     {
-        return (handler) => handler.AssociationCollector.Default.Handle(It.Is(MatchDefaultAssociationCommand(parameter)));
+        return (recorder) => recorder.Handle(It.Is(MatchRecordDefaultCommand(parameterSymbol)));
     }
 
-    private static Expression<Func<IAddDefaultCSharpAttributeConstructorCommand, bool>> MatchDefaultAssociationCommand(
-        IParameterSymbol parameter)
+    private static Expression<Func<IRecordArgumentAssociationCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>, bool>> MatchRecordDefaultCommand(
+        IParameterSymbol parameterSymbol)
     {
-        return (command) => ReferenceEquals(command.Parameter, parameter);
+        return (command) => MatchParameter(parameterSymbol, command.Parameter);
+    }
+
+    private static bool MatchParameter(
+        IParameterSymbol parameterSymbol,
+        IMethodParameter parameter)
+    {
+        return ReferenceEquals(parameterSymbol, parameter.Symbol);
+    }
+
+    private static bool MatchNormalArgumentData(
+        AttributeArgumentSyntax syntacticArgument,
+        INormalCSharpAttributeConstructorArgumentData argumentData)
+    {
+        return ReferenceEquals(syntacticArgument, argumentData.SyntacticArgument);
+    }
+
+    private static bool MatchParamsArgumentData(
+        IReadOnlyList<AttributeArgumentSyntax> syntacticArguments,
+        IParamsCSharpAttributeConstructorArgumentData argumentData)
+    {
+        return Enumerable.SequenceEqual(syntacticArguments, argumentData.SyntacticArguments);
     }
 
     private void Target(
-        IAssociateArgumentsQuery<IAssociateSyntacticCSharpAttributeConstructorData> query,
-        IInvalidatingAssociateSyntacticCSharpAttributeConstructorQueryResponseHandler queryResponseHandler)
+        IAssociateArgumentsCommand<IAssociateSyntacticCSharpAttributeConstructorData> command)
     {
-        Fixture.Sut.Handle(query, queryResponseHandler);
+        Fixture.Sut.Handle(command);
     }
 }
