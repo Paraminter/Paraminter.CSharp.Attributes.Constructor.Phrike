@@ -1,9 +1,7 @@
-﻿namespace Paraminter.CSharp.Attributes.Constructor.Phrike.Common;
+﻿namespace Paraminter.CSharp.Attributes.Constructor.Phrike.Queries;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-using Paraminter.CSharp.Attributes.Constructor.Phrike.Queries;
 
 internal sealed class IsCSharpAttributeConstructorArgumentParamsQuery
     : IIsCSharpAttributeConstructorArgumentParamsQuery

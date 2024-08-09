@@ -1,7 +1,7 @@
 ﻿namespace Paraminter.CSharp.Attributes.Constructor.Phrike;
 
+using Paraminter.Cqs.Handlers;
 using Paraminter.CSharp.Attributes.Constructor.Phrike.Queries;
-using Paraminter.Queries.Handlers;
 
 internal static class FixtureFactory
 {
