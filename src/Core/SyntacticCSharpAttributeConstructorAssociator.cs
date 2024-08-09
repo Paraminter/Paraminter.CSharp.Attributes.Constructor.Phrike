@@ -4,13 +4,12 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Paraminter.Arguments.CSharp.Attributes.Constructor.Models;
-using Paraminter.Associators.Commands;
-using Paraminter.Commands.Handlers;
-using Paraminter.CSharp.Attributes.Constructor.Phrike.Common;
+using Paraminter.Commands;
+using Paraminter.Cqs.Handlers;
+using Paraminter.CSharp.Attributes.Constructor.Phrike.Commands;
 using Paraminter.CSharp.Attributes.Constructor.Phrike.Models;
 using Paraminter.CSharp.Attributes.Constructor.Phrike.Queries;
 using Paraminter.Parameters.Method.Models;
-using Paraminter.Queries.Handlers;
 using Paraminter.Recorders.Commands;
 
 using System;

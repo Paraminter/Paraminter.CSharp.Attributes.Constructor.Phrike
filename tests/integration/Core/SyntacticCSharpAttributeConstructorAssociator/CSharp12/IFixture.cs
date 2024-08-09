@@ -3,12 +3,11 @@
 using Moq;
 
 using Paraminter.Arguments.CSharp.Attributes.Constructor.Models;
-using Paraminter.Associators.Commands;
-using Paraminter.Commands.Handlers;
+using Paraminter.Commands;
+using Paraminter.Cqs.Handlers;
 using Paraminter.CSharp.Attributes.Constructor.Phrike.Models;
 using Paraminter.CSharp.Attributes.Constructor.Phrike.Queries;
 using Paraminter.Parameters.Method.Models;
-using Paraminter.Queries.Handlers;
 using Paraminter.Recorders.Commands;
 
 internal interface IFixture

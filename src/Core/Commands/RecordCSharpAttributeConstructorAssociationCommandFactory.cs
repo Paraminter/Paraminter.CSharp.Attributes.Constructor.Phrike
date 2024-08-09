@@ -1,4 +1,4 @@
-﻿namespace Paraminter.CSharp.Attributes.Constructor.Phrike.Common;
+﻿namespace Paraminter.CSharp.Attributes.Constructor.Phrike.Commands;
 
 using Paraminter.Arguments.Models;
 using Paraminter.Parameters.Method.Models;

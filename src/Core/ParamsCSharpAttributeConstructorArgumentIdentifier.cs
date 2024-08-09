@@ -2,8 +2,8 @@
 
 using Microsoft.CodeAnalysis;
 
+using Paraminter.Cqs.Handlers;
 using Paraminter.CSharp.Attributes.Constructor.Phrike.Queries;
-using Paraminter.Queries.Handlers;
 
 using System;
 

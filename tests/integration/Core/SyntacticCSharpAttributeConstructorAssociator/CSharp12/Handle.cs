@@ -6,8 +6,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Moq;
 
 using Paraminter.Arguments.CSharp.Attributes.Constructor.Models;
-using Paraminter.Associators.Commands;
-using Paraminter.Commands.Handlers;
+using Paraminter.Commands;
+using Paraminter.Cqs.Handlers;
 using Paraminter.CSharp.Attributes.Constructor.Phrike.Models;
 using Paraminter.Parameters.Method.Models;
 using Paraminter.Recorders.Commands;
