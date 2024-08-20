@@ -7,12 +7,12 @@ using Paraminter.CSharp.Attributes.Constructor.Phrike.Queries;
 
 using System;
 
-/// <summary>Identifies <see langword="params"/> C# attribute constructor arguments.</summary>
-public sealed class ParamsCSharpAttributeConstructorArgumentIdentifier
+/// <summary>Distinguishes between <see langword="params"/> and non-<see langword="params"/> C# attribute constructor arguments.</summary>
+public sealed class CSharpAttributeConstructorParamsArgumentDistinguisher
     : IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool>
 {
-    /// <summary>Instantiates a <see cref="ParamsCSharpAttributeConstructorArgumentIdentifier"/>, identifying <see langword="params"/> C# attribute constructor arguments.</summary>
-    public ParamsCSharpAttributeConstructorArgumentIdentifier() { }
+    /// <summary>Instantiates a <see cref="CSharpAttributeConstructorParamsArgumentDistinguisher"/>, distinguishing between <see langword="params"/> and non-<see langword="params"/> C# attribute constructor arguments.</summary>
+    public CSharpAttributeConstructorParamsArgumentDistinguisher() { }
 
     bool IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool>.Handle(
         IIsCSharpAttributeConstructorArgumentParamsQuery query)

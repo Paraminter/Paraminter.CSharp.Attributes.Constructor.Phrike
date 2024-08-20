@@ -7,7 +7,7 @@ internal static class FixtureFactory
 {
     public static IFixture Create()
     {
-        ParamsCSharpAttributeConstructorArgumentIdentifier sut = new();
+        CSharpAttributeConstructorParamsArgumentDistinguisher sut = new();
 
         return new Fixture(sut);
     }

@@ -25,21 +25,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "unit", "unit", "{C195DF18-4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{1581E7AE-8100-4305-BE27-2EEFC46930B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParamsCSharpAttributeConstructorArgumentIdentifier", "tests\unit\Core\ParamsCSharpAttributeConstructorArgumentIdentifier\ParamsCSharpAttributeConstructorArgumentIdentifier.csproj", "{9034F111-B6E2-43DC-89EE-D9E66DBF4CFF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpAttributeConstructorAssociator", "tests\unit\Core\CSharpAttributeConstructorAssociator\CSharpAttributeConstructorAssociator.csproj", "{B72989E4-DBA6-4D97-9D23-D21F4EC8203D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyntacticCSharpAttributeConstructorAssociator", "tests\unit\Core\SyntacticCSharpAttributeConstructorAssociator\SyntacticCSharpAttributeConstructorAssociator.csproj", "{4F51C630-1EEC-44EA-B584-06B2FA7180E5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "integration", "integration", "{CBCEB9F2-BC77-418A-9A48-F8F71D7E635F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "integration", "integration", "{B6581A09-C8FE-4475-A579-5705A9A6FB5F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{43FB44FB-4C16-4357-BCC5-6088B8BC13DA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{7F71AF50-00A4-4171-B1BC-B55FAA33140E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CSharpAttributeConstructorAssociator", "CSharpAttributeConstructorAssociator", "{D7757EA8-0A39-4BF0-B782-C4EA7879AB36}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ParamsCSharpAttributeConstructorArgumentIdentifier", "ParamsCSharpAttributeConstructorArgumentIdentifier", "{89EE29CD-FDF0-4CDC-BCB8-E45A013AEE76}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpAttributeConstructorAssociator_CSharp12", "tests\integration\Core\CSharpAttributeConstructorAssociator\CSharp12\CSharpAttributeConstructorAssociator_CSharp12.csproj", "{689A14BD-3C4A-45C6-AD9B-6DB61AD91D4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParamsCSharpAttributeConstructorArgumentIdentifier_CSharp12", "tests\integration\Core\ParamsCSharpAttributeConstructorArgumentIdentifier\CSharp12\ParamsCSharpAttributeConstructorArgumentIdentifier_CSharp12.csproj", "{A23757AB-A085-47F0-BA45-9EAEC970AFD3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Errors", "Errors", "{D7078E23-F98E-46CA-B022-663158531CDE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SyntacticCSharpAttributeConstructorAssociator", "SyntacticCSharpAttributeConstructorAssociator", "{0798BC93-B37C-4650-A256-D8F5056E3FB5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpAttributeConstructorAssociatorErrorHandler", "tests\unit\Core\Errors\CSharpAttributeConstructorAssociatorErrorHandler\CSharpAttributeConstructorAssociatorErrorHandler.csproj", "{253CD994-40C4-4783-BD44-64206266BD1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyntacticCSharpAttributeConstructorAssociator_CSharp12", "tests\integration\Core\SyntacticCSharpAttributeConstructorAssociator\CSharp12\SyntacticCSharpAttributeConstructorAssociator_CSharp12.csproj", "{72841E15-F33F-4307-954A-E7A3FBB0285F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpAttributeConstructorParamsArgumentDistinguisher", "tests\unit\Core\CSharpAttributeConstructorParamsArgumentDistinguisher\CSharpAttributeConstructorParamsArgumentDistinguisher.csproj", "{051251D7-FDC8-4726-9B9F-C3617DE8F6B7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CSharpAttributeConstructorParamsArgumentDistinguisher", "CSharpAttributeConstructorParamsArgumentDistinguisher", "{4C206407-3269-4C5D-A5CC-5C11ADD8F58A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpAttributeConstructorParamsArgumentDistinguisher_CSharp12", "tests\integration\Core\CSharpAttributeConstructorParamsArgumentDistinguisher\CSharp12\CSharpAttributeConstructorParamsArgumentDistinguisher_CSharp12.csproj", "{778CE5C3-9B8C-4A21-8C12-1DF6CDEF7035}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,22 +63,26 @@ Global
 		{E4268D70-E614-4815-9F6D-43CC31EA68DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4268D70-E614-4815-9F6D-43CC31EA68DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4268D70-E614-4815-9F6D-43CC31EA68DE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9034F111-B6E2-43DC-89EE-D9E66DBF4CFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9034F111-B6E2-43DC-89EE-D9E66DBF4CFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9034F111-B6E2-43DC-89EE-D9E66DBF4CFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9034F111-B6E2-43DC-89EE-D9E66DBF4CFF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4F51C630-1EEC-44EA-B584-06B2FA7180E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4F51C630-1EEC-44EA-B584-06B2FA7180E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4F51C630-1EEC-44EA-B584-06B2FA7180E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4F51C630-1EEC-44EA-B584-06B2FA7180E5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A23757AB-A085-47F0-BA45-9EAEC970AFD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A23757AB-A085-47F0-BA45-9EAEC970AFD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A23757AB-A085-47F0-BA45-9EAEC970AFD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A23757AB-A085-47F0-BA45-9EAEC970AFD3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{72841E15-F33F-4307-954A-E7A3FBB0285F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{72841E15-F33F-4307-954A-E7A3FBB0285F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{72841E15-F33F-4307-954A-E7A3FBB0285F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{72841E15-F33F-4307-954A-E7A3FBB0285F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B72989E4-DBA6-4D97-9D23-D21F4EC8203D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B72989E4-DBA6-4D97-9D23-D21F4EC8203D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B72989E4-DBA6-4D97-9D23-D21F4EC8203D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B72989E4-DBA6-4D97-9D23-D21F4EC8203D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{689A14BD-3C4A-45C6-AD9B-6DB61AD91D4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{689A14BD-3C4A-45C6-AD9B-6DB61AD91D4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{689A14BD-3C4A-45C6-AD9B-6DB61AD91D4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{689A14BD-3C4A-45C6-AD9B-6DB61AD91D4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{253CD994-40C4-4783-BD44-64206266BD1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{253CD994-40C4-4783-BD44-64206266BD1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{253CD994-40C4-4783-BD44-64206266BD1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{253CD994-40C4-4783-BD44-64206266BD1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{051251D7-FDC8-4726-9B9F-C3617DE8F6B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{051251D7-FDC8-4726-9B9F-C3617DE8F6B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{051251D7-FDC8-4726-9B9F-C3617DE8F6B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{051251D7-FDC8-4726-9B9F-C3617DE8F6B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{778CE5C3-9B8C-4A21-8C12-1DF6CDEF7035}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{778CE5C3-9B8C-4A21-8C12-1DF6CDEF7035}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{778CE5C3-9B8C-4A21-8C12-1DF6CDEF7035}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{778CE5C3-9B8C-4A21-8C12-1DF6CDEF7035}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -85,14 +93,16 @@ Global
 		{E4268D70-E614-4815-9F6D-43CC31EA68DE} = {738DF42C-D4A2-4141-B2DE-590571402875}
 		{C195DF18-4C9F-441E-9464-C44D308FD6B1} = {9976DE2B-7904-46AE-96F8-B9276C914C89}
 		{1581E7AE-8100-4305-BE27-2EEFC46930B3} = {C195DF18-4C9F-441E-9464-C44D308FD6B1}
-		{9034F111-B6E2-43DC-89EE-D9E66DBF4CFF} = {1581E7AE-8100-4305-BE27-2EEFC46930B3}
-		{4F51C630-1EEC-44EA-B584-06B2FA7180E5} = {1581E7AE-8100-4305-BE27-2EEFC46930B3}
-		{B6581A09-C8FE-4475-A579-5705A9A6FB5F} = {9976DE2B-7904-46AE-96F8-B9276C914C89}
-		{7F71AF50-00A4-4171-B1BC-B55FAA33140E} = {B6581A09-C8FE-4475-A579-5705A9A6FB5F}
-		{89EE29CD-FDF0-4CDC-BCB8-E45A013AEE76} = {7F71AF50-00A4-4171-B1BC-B55FAA33140E}
-		{A23757AB-A085-47F0-BA45-9EAEC970AFD3} = {89EE29CD-FDF0-4CDC-BCB8-E45A013AEE76}
-		{0798BC93-B37C-4650-A256-D8F5056E3FB5} = {7F71AF50-00A4-4171-B1BC-B55FAA33140E}
-		{72841E15-F33F-4307-954A-E7A3FBB0285F} = {0798BC93-B37C-4650-A256-D8F5056E3FB5}
+		{B72989E4-DBA6-4D97-9D23-D21F4EC8203D} = {1581E7AE-8100-4305-BE27-2EEFC46930B3}
+		{CBCEB9F2-BC77-418A-9A48-F8F71D7E635F} = {9976DE2B-7904-46AE-96F8-B9276C914C89}
+		{43FB44FB-4C16-4357-BCC5-6088B8BC13DA} = {CBCEB9F2-BC77-418A-9A48-F8F71D7E635F}
+		{D7757EA8-0A39-4BF0-B782-C4EA7879AB36} = {43FB44FB-4C16-4357-BCC5-6088B8BC13DA}
+		{689A14BD-3C4A-45C6-AD9B-6DB61AD91D4A} = {D7757EA8-0A39-4BF0-B782-C4EA7879AB36}
+		{D7078E23-F98E-46CA-B022-663158531CDE} = {1581E7AE-8100-4305-BE27-2EEFC46930B3}
+		{253CD994-40C4-4783-BD44-64206266BD1F} = {D7078E23-F98E-46CA-B022-663158531CDE}
+		{051251D7-FDC8-4726-9B9F-C3617DE8F6B7} = {1581E7AE-8100-4305-BE27-2EEFC46930B3}
+		{4C206407-3269-4C5D-A5CC-5C11ADD8F58A} = {43FB44FB-4C16-4357-BCC5-6088B8BC13DA}
+		{778CE5C3-9B8C-4A21-8C12-1DF6CDEF7035} = {4C206407-3269-4C5D-A5CC-5C11ADD8F58A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {03179225-A3B7-47F2-BED2-FFC518DCFD28}

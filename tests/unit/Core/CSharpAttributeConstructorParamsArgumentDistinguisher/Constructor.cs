@@ -5,12 +5,12 @@ using Xunit;
 public sealed class Constructor
 {
     [Fact]
-    public void ReturnsIdentifier()
+    public void ReturnsDistinguisher()
     {
         var result = Target();
 
         Assert.NotNull(result);
     }
 
-    private static ParamsCSharpAttributeConstructorArgumentIdentifier Target() => new();
+    private static CSharpAttributeConstructorParamsArgumentDistinguisher Target() => new();
 }
