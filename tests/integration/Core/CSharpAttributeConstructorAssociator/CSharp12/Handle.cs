@@ -48,7 +48,7 @@ public sealed class Handle
         var attributeSyntax = syntaxTree.GetRoot().DescendantNodes().OfType<AttributeSyntax>().Single();
         var syntacticArguments = attributeSyntax.ArgumentList!.Arguments;
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup(static (command) => command.Data.Parameters).Returns(parameters);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
@@ -95,7 +95,7 @@ public sealed class Handle
         var attributeSyntax = syntaxTree.GetRoot().DescendantNodes().OfType<AttributeSyntax>().Single();
         var syntacticArguments = attributeSyntax.ArgumentList!.Arguments;
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup(static (command) => command.Data.Parameters).Returns(parameters);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
@@ -135,7 +135,7 @@ public sealed class Handle
         var type = compilation.GetTypeByMetadataName("Foo")!;
         var parameters = type.GetAttributes()[0].AttributeConstructor!.Parameters;
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup((query) => query.Data.Parameters).Returns(parameters);
         commandMock.Setup((query) => query.Data.SyntacticArguments).Returns([]);
@@ -217,7 +217,7 @@ public sealed class Handle
     }
 
     private void Target(
-        IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData> command)
+        IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData> command)
     {
         Fixture.Sut.Handle(command);
     }

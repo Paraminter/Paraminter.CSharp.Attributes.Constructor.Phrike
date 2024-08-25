@@ -8,7 +8,7 @@ using Paraminter.Models;
 using System.Collections.Generic;
 
 /// <summary>Represents data used to associate all syntactic C# attribute constructor arguments with parameters.</summary>
-public interface IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData
+public interface IAssociateAllCSharpAttributeConstructorArgumentsData
     : IAssociateAllArgumentsData
 {
     /// <summary>The attribute constructor parameters.</summary>
