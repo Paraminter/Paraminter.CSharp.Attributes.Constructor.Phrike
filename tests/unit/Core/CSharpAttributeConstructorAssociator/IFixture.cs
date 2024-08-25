@@ -12,7 +12,7 @@ using Paraminter.Parameters.Method.Models;
 
 internal interface IFixture
 {
-    public abstract ICommandHandler<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>> Sut { get; }
+    public abstract ICommandHandler<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> Sut { get; }
 
     public abstract Mock<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>> NormalIndividualAssociatorMock { get; }
     public abstract Mock<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>> ParamsIndividualAssociatorMock { get; }

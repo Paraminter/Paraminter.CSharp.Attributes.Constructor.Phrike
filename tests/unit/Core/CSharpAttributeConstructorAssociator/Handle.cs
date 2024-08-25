@@ -43,7 +43,7 @@ public sealed class Handle
         parameterSymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(false);
         parameterSymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(false);
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameterSymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns([]);
@@ -76,7 +76,7 @@ public sealed class Handle
         parameter2SymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(true);
         parameter2SymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(false);
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameter1SymbolMock.Object, parameter2SymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
@@ -102,7 +102,7 @@ public sealed class Handle
         parameterSymbolMock.Setup(static (symbol) => symbol.Name).Returns("Foo");
         parameterSymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(true);
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameterSymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
@@ -130,7 +130,7 @@ public sealed class Handle
         parameter2SymbolMock.Setup(static (symbol) => symbol.Name).Returns(parameterName);
         parameter2SymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(true);
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameter1SymbolMock.Object, parameter2SymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns([]);
@@ -163,7 +163,7 @@ public sealed class Handle
         parameter2SymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(true);
         parameter2SymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(false);
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameter1SymbolMock.Object, parameter2SymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
@@ -196,7 +196,7 @@ public sealed class Handle
         parameter2SymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(true);
         parameter2SymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(false);
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameter1SymbolMock.Object, parameter2SymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
@@ -230,7 +230,7 @@ public sealed class Handle
         parameterSymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(false);
         parameterSymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(false);
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameterSymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
@@ -259,7 +259,7 @@ public sealed class Handle
         parameterSymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(false);
         parameterSymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(true);
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameterSymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns([]);
@@ -294,7 +294,7 @@ public sealed class Handle
         parameterSymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(false);
         parameterSymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(true);
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameterSymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
@@ -329,7 +329,7 @@ public sealed class Handle
         parameterSymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(false);
         parameterSymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(true);
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameterSymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
@@ -367,7 +367,7 @@ public sealed class Handle
         parameterSymbolMock.Setup(static (symbol) => symbol.IsOptional).Returns(false);
         parameterSymbolMock.Setup(static (symbol) => symbol.IsParams).Returns(true);
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameterSymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
@@ -530,7 +530,7 @@ public sealed class Handle
     }
 
     private void Target(
-        IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData> command)
+        IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData> command)
     {
         Fixture.Sut.Handle(command);
     }

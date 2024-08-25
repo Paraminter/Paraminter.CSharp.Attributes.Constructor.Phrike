@@ -17,9 +17,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>Associates C# attribute constructor arguments with parameters.</summary>
+/// <summary>Associates syntactic C# attribute constructor arguments with parameters.</summary>
 public sealed class CSharpAttributeConstructorAssociator
-    : ICommandHandler<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>>
+    : ICommandHandler<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>>
 {
     private readonly ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>> NormalIndividualAssociator;
     private readonly ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>> ParamsIndividualAssociator;
@@ -29,11 +29,11 @@ public sealed class CSharpAttributeConstructorAssociator
 
     private readonly ICSharpAttributeConstructorAssociatorErrorHandler ErrorHandler;
 
-    /// <summary>Instantiates an associator of C# attribute constructor arguments with parameters.</summary>
-    /// <param name="normalIndividualAssociator">Associates individual normal C# attribute constructor arguments with parameters.</param>
-    /// <param name="paramsIndividualAssociator">Associates individual <see langword="params"/> C# attribute constructor arguments with parameters.</param>
-    /// <param name="defaultIndividualAssociator">Associates individual default C# attribute constructor arguments with parameters.</param>
-    /// <param name="paramsArgumentDistinguisher">Distinguishes between <see langword="params"/> and non-<see langword="params"/> arguments.</param>
+    /// <summary>Instantiates an associator of syntactic C# attribute constructor arguments with parameters.</summary>
+    /// <param name="normalIndividualAssociator">Associates individual normal syntactic C# attribute constructor arguments with parameters.</param>
+    /// <param name="paramsIndividualAssociator">Associates individual <see langword="params"/> syntactic C# attribute constructor arguments with parameters.</param>
+    /// <param name="defaultIndividualAssociator">Associates individual default syntactic C# attribute constructor arguments with parameters.</param>
+    /// <param name="paramsArgumentDistinguisher">Distinguishes between <see langword="params"/> and non-<see langword="params"/> syntactic C# attribute constructor arguments.</param>
     /// <param name="errorHandler">Handles encountered errors.</param>
     public CSharpAttributeConstructorAssociator(
         ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>> normalIndividualAssociator,
@@ -51,8 +51,8 @@ public sealed class CSharpAttributeConstructorAssociator
         ErrorHandler = errorHandler ?? throw new ArgumentNullException(nameof(errorHandler));
     }
 
-    void ICommandHandler<IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData>>.Handle(
-        IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData> command)
+    void ICommandHandler<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>>.Handle(
+        IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData> command)
     {
         if (command is null)
         {
@@ -70,7 +70,7 @@ public sealed class CSharpAttributeConstructorAssociator
             ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>> defaultIndividualAssociator,
             IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool> paramsArgumentDistinguisher,
             ICSharpAttributeConstructorAssociatorErrorHandler errorHandler,
-            IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData> command)
+            IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData> command)
         {
             var associator = new Associator(normalIndividualAssociator, paramsIndividualAssociator, defaultIndividualAssociator, paramsArgumentDistinguisher, errorHandler, command);
 
@@ -85,7 +85,7 @@ public sealed class CSharpAttributeConstructorAssociator
 
         private readonly ICSharpAttributeConstructorAssociatorErrorHandler ErrorHandler;
 
-        private readonly IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData UnassociatedInvocationData;
+        private readonly IAssociateAllCSharpAttributeConstructorArgumentsData UnassociatedInvocationData;
 
         private readonly IDictionary<string, ParameterStatus> ParametersByName;
 
@@ -99,7 +99,7 @@ public sealed class CSharpAttributeConstructorAssociator
             ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>> defaultIndividualAssociator,
             IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool> paramsArgumentDistinguisher,
             ICSharpAttributeConstructorAssociatorErrorHandler errorHandler,
-            IAssociateAllArgumentsCommand<IAssociateAllSyntacticCSharpAttributeConstructorArgumentsData> command)
+            IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData> command)
         {
             NormalIndividualAssociator = normalIndividualAssociator;
             ParamsIndividualAssociator = paramsIndividualAssociator;

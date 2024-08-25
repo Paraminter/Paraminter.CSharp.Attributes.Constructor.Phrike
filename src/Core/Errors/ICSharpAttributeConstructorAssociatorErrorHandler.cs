@@ -3,7 +3,7 @@
 using Paraminter.Cqs.Handlers;
 using Paraminter.CSharp.Attributes.Constructor.Phrike.Errors.Commands;
 
-/// <summary>Handles errors encountered when associating C# attribute constructor arguments with parameters.</summary>
+/// <summary>Handles errors encountered when associating syntactic C# attribute constructor arguments with parameters.</summary>
 public interface ICSharpAttributeConstructorAssociatorErrorHandler
 {
     /// <summary>Handles a missing required argument.</summary>
