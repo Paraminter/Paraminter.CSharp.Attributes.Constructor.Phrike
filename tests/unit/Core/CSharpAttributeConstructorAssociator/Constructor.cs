@@ -1,12 +1,12 @@
-﻿namespace Paraminter.CSharp.Attributes.Constructor.Phrike;
+﻿namespace Paraminter.Associating.CSharp.Attributes.Constructor.Phrike;
 
 using Moq;
 
 using Paraminter.Arguments.CSharp.Attributes.Constructor.Models;
-using Paraminter.Commands;
+using Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Errors;
+using Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Queries;
 using Paraminter.Cqs.Handlers;
-using Paraminter.CSharp.Attributes.Constructor.Phrike.Errors;
-using Paraminter.CSharp.Attributes.Constructor.Phrike.Queries;
+using Paraminter.Pairing.Commands;
 using Paraminter.Parameters.Method.Models;
 
 using System;
@@ -16,12 +16,12 @@ using Xunit;
 public sealed class Constructor
 {
     [Fact]
-    public void NullNormalIndividualAssociator_ThrowsArgumentNullException()
+    public void NullNormalPairer_ThrowsArgumentNullException()
     {
         var result = Record.Exception(() => Target(
             null!,
-            Mock.Of<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>>(),
-            Mock.Of<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>>(),
+            Mock.Of<ICommandHandler<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>>(),
+            Mock.Of<ICommandHandler<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>>(),
             Mock.Of<IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool>>(),
             Mock.Of<ICSharpAttributeConstructorAssociatorErrorHandler>()));
 
@@ -29,12 +29,12 @@ public sealed class Constructor
     }
 
     [Fact]
-    public void NullParamsIndividualAssociator_ThrowsArgumentNullException()
+    public void NullParamsPairer_ThrowsArgumentNullException()
     {
         var result = Record.Exception(() => Target(
-            Mock.Of<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>>(),
+            Mock.Of<ICommandHandler<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>>(),
             null!,
-            Mock.Of<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>>(),
+            Mock.Of<ICommandHandler<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>>(),
             Mock.Of<IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool>>(),
             Mock.Of<ICSharpAttributeConstructorAssociatorErrorHandler>()));
 
@@ -42,11 +42,11 @@ public sealed class Constructor
     }
 
     [Fact]
-    public void NullDefaultIndividualAssociator_ThrowsArgumentNullException()
+    public void NullDefaultPairer_ThrowsArgumentNullException()
     {
         var result = Record.Exception(() => Target(
-            Mock.Of<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>>(),
-            Mock.Of<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>>(),
+            Mock.Of<ICommandHandler<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>>(),
+            Mock.Of<ICommandHandler<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>>(),
             null!,
             Mock.Of<IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool>>(),
             Mock.Of<ICSharpAttributeConstructorAssociatorErrorHandler>()));
@@ -58,9 +58,9 @@ public sealed class Constructor
     public void NullParamsArgumentDistinguisher_ThrowsArgumentNullException()
     {
         var result = Record.Exception(() => Target(
-            Mock.Of<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>>(),
-            Mock.Of<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>>(),
-            Mock.Of<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>>(),
+            Mock.Of<ICommandHandler<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>>(),
+            Mock.Of<ICommandHandler<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>>(),
+            Mock.Of<ICommandHandler<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>>(),
             null!,
             Mock.Of<ICSharpAttributeConstructorAssociatorErrorHandler>()));
 
@@ -71,9 +71,9 @@ public sealed class Constructor
     public void NullErrorHandler_ThrowsArgumentNullException()
     {
         var result = Record.Exception(() => Target(
-            Mock.Of<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>>(),
-            Mock.Of<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>>(),
-            Mock.Of<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>>(),
+            Mock.Of<ICommandHandler<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>>(),
+            Mock.Of<ICommandHandler<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>>(),
+            Mock.Of<ICommandHandler<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>>(),
             Mock.Of<IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool>>(),
             null!));
 
@@ -84,9 +84,9 @@ public sealed class Constructor
     public void ValidArguments_ReturnsAssociator()
     {
         var result = Target(
-            Mock.Of<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>>(),
-            Mock.Of<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>>(),
-            Mock.Of<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>>(),
+            Mock.Of<ICommandHandler<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>>(),
+            Mock.Of<ICommandHandler<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>>(),
+            Mock.Of<ICommandHandler<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>>(),
             Mock.Of<IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool>>(),
             Mock.Of<ICSharpAttributeConstructorAssociatorErrorHandler>());
 
@@ -94,12 +94,12 @@ public sealed class Constructor
     }
 
     private static CSharpAttributeConstructorAssociator Target(
-        ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>> normalIndividualAssocitor,
-        ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>> paramsIndividualAssociator,
-        ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>> defaultIndividualAssociator,
+        ICommandHandler<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>> normalPairer,
+        ICommandHandler<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>> paramsPairer,
+        ICommandHandler<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>> defaultPairer,
         IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool> paramsArgumentDistinguisher,
         ICSharpAttributeConstructorAssociatorErrorHandler errorHandler)
     {
-        return new CSharpAttributeConstructorAssociator(normalIndividualAssocitor, paramsIndividualAssociator, defaultIndividualAssociator, paramsArgumentDistinguisher, errorHandler);
+        return new CSharpAttributeConstructorAssociator(normalPairer, paramsPairer, defaultPairer, paramsArgumentDistinguisher, errorHandler);
     }
 }

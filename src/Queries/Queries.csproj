@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <AssemblyName>Paraminter.CSharp.Attributes.Constructor.Phrike.Queries</AssemblyName>
+        <AssemblyName>Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Queries</AssemblyName>
 
-        <RootNamespace>Paraminter.CSharp.Attributes.Constructor.Phrike.Queries</RootNamespace>
+        <RootNamespace>Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Queries</RootNamespace>
         
-        <PackageId>Paraminter.CSharp.Attributes.Constructor.Phrike.Queries</PackageId>
+        <PackageId>Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Queries</PackageId>
         <Description>Defines queries for a Paraminter associator of syntactic C# attribute constructor arguments.</Description>
     </PropertyGroup>
 

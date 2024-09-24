@@ -1,10 +1,10 @@
-﻿namespace Paraminter.CSharp.Attributes.Constructor.Phrike;
+﻿namespace Paraminter.Associating.CSharp.Attributes.Constructor.Phrike;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Moq;
 
-using Paraminter.CSharp.Attributes.Constructor.Phrike.Queries;
+using Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Queries;
 
 using Xunit;
 

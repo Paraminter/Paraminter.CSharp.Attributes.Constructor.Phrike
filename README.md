@@ -1,4 +1,4 @@
-# Paraminter.CSharp.Attributes.Constructor.Phrike
+# Paraminter.Associating.CSharp.Attributes.Constructor.Phrike
 
 Provides a `Paraminter` associator of syntactic C# attribute constructor arguments.
 

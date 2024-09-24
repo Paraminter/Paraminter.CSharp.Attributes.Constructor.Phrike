@@ -1,4 +1,4 @@
-﻿namespace Paraminter.CSharp.Attributes.Constructor.Phrike.Errors.Commands;
+﻿namespace Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Errors.Commands;
 
 internal sealed class HandleDuplicateParameterNamesCommand
     : IHandleDuplicateParameterNamesCommand

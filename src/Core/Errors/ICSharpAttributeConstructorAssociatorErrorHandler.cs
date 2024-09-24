@@ -1,7 +1,7 @@
-﻿namespace Paraminter.CSharp.Attributes.Constructor.Phrike.Errors;
+﻿namespace Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Errors;
 
+using Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Errors.Commands;
 using Paraminter.Cqs.Handlers;
-using Paraminter.CSharp.Attributes.Constructor.Phrike.Errors.Commands;
 
 /// <summary>Handles errors encountered when associating syntactic C# attribute constructor arguments with parameters.</summary>
 public interface ICSharpAttributeConstructorAssociatorErrorHandler

@@ -1,4 +1,4 @@
-﻿namespace Paraminter.CSharp.Attributes.Constructor.Phrike.Models;
+﻿namespace Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Models;
 
 using Microsoft.CodeAnalysis;
 

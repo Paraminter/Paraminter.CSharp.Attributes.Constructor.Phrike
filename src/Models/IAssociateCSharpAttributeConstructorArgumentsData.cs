@@ -1,15 +1,15 @@
-﻿namespace Paraminter.CSharp.Attributes.Constructor.Phrike.Models;
+﻿namespace Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Models;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using Paraminter.Models;
+using Paraminter.Associating.Models;
 
 using System.Collections.Generic;
 
-/// <summary>Represents data used to associate all syntactic C# attribute constructor arguments with parameters.</summary>
-public interface IAssociateAllCSharpAttributeConstructorArgumentsData
-    : IAssociateAllArgumentsData
+/// <summary>Represents data used to associate syntactic C# attribute constructor arguments with parameters.</summary>
+public interface IAssociateCSharpAttributeConstructorArgumentsData
+    : IAssociateArgumentsData
 {
     /// <summary>The attribute constructor parameters.</summary>
     public abstract IReadOnlyList<IParameterSymbol> Parameters { get; }

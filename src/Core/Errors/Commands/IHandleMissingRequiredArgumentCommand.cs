@@ -1,4 +1,4 @@
-﻿namespace Paraminter.CSharp.Attributes.Constructor.Phrike.Errors.Commands;
+﻿namespace Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Errors.Commands;
 
 using Paraminter.Cqs;
 using Paraminter.Parameters.Method.Models;

@@ -3,7 +3,7 @@
     <PropertyGroup>
         <LangVersion>12</LangVersion>
 
-        <RootNamespace>Paraminter.CSharp.Attributes.Constructor.Phrike</RootNamespace>
+        <RootNamespace>Paraminter.Associating.CSharp.Attributes.Constructor.Phrike</RootNamespace>
 
         <Nullable>enable</Nullable>
         <AnalysisMode>all</AnalysisMode>
