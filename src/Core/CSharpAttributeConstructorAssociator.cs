@@ -119,11 +119,11 @@ public sealed class CSharpAttributeConstructorAssociator
         {
             ResetParametersByNameDictionary();
 
-            AssociateSpecifiedArguments();
-            ValidateUnassociatedArguments();
+            PairSpecifiedArguments();
+            ValidateUnpairedArguments();
         }
 
-        private void AssociateSpecifiedArguments()
+        private void PairSpecifiedArguments()
         {
             var maximumNumberOfSpecifiedArguments = Math.Min(UnassociatedInvocationData.Parameters.Count, UnassociatedInvocationData.SyntacticArguments.Count);
 
@@ -138,11 +138,11 @@ public sealed class CSharpAttributeConstructorAssociator
             }
         }
 
-        private void ValidateUnassociatedArguments()
+        private void ValidateUnpairedArguments()
         {
-            var unassociatedParameters = ParametersByName.Values.Where(static (parsableParameter) => parsableParameter.HasBeenAssociated is false);
+            var unpairedParameters = ParametersByName.Values.Where(static (parsableParameter) => parsableParameter.HasBeenPaired is false);
 
-            foreach (var parameterSymbol in unassociatedParameters.Select(static (parsableParameter) => parsableParameter.Symbol))
+            foreach (var parameterSymbol in unpairedParameters.Select(static (parsableParameter) => parsableParameter.Symbol))
             {
                 if (parameterSymbol.IsOptional)
                 {
@@ -218,7 +218,7 @@ public sealed class CSharpAttributeConstructorAssociator
                 return;
             }
 
-            if (parameterStatus.HasBeenAssociated)
+            if (parameterStatus.HasBeenPaired)
             {
                 HandleDuplicateArgumentsCommand(parameterStatus.Symbol, UnassociatedInvocationData.SyntacticArguments[index]);
 
@@ -399,14 +399,14 @@ public sealed class CSharpAttributeConstructorAssociator
         private readonly struct ParameterStatus
         {
             public IParameterSymbol Symbol { get; }
-            public bool HasBeenAssociated { get; }
+            public bool HasBeenPaired { get; }
 
             public ParameterStatus(
                 IParameterSymbol symbol,
                 bool hasBeenParsed)
             {
                 Symbol = symbol;
-                HasBeenAssociated = hasBeenParsed;
+                HasBeenPaired = hasBeenParsed;
             }
         }
     }
