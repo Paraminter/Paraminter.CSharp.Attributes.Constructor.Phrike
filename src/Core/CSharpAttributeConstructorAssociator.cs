@@ -129,7 +129,7 @@ public sealed class CSharpAttributeConstructorAssociator
 
             for (var i = 0; i < maximumNumberOfSpecifiedArguments; i++)
             {
-                AssociateArgumentAtIndex(i);
+                PairArgumentAtIndex(i);
 
                 if (HasEncounteredParamsArgument || HasEncounteredNamedArgument)
                 {
@@ -162,7 +162,7 @@ public sealed class CSharpAttributeConstructorAssociator
             }
         }
 
-        private void AssociateArgumentAtIndex(
+        private void PairArgumentAtIndex(
             int index)
         {
             if (UnassociatedInvocationData.SyntacticArguments[index].NameEquals is not null)
@@ -174,7 +174,7 @@ public sealed class CSharpAttributeConstructorAssociator
 
             if (UnassociatedInvocationData.SyntacticArguments[index].NameColon is NameColonSyntax nameColonSyntax)
             {
-                AssociateNameColonArgumentAtIndex(index, nameColonSyntax);
+                PairNameColonArgumentAtIndex(index, nameColonSyntax);
 
                 return;
             }
@@ -188,21 +188,21 @@ public sealed class CSharpAttributeConstructorAssociator
 
             if (UnassociatedInvocationData.Parameters[index].IsParams)
             {
-                AssociateParamsParameterArgumentAtIndex(index);
+                PairParamsParameterArgumentAtIndex(index);
 
                 return;
             }
 
-            AssociateNormalArgumentAtIndex(index);
+            PairNormalArgumentAtIndex(index);
         }
 
-        private void AssociateNormalArgumentAtIndex(
+        private void PairNormalArgumentAtIndex(
             int index)
         {
             PairNormalArgument(UnassociatedInvocationData.Parameters[index], UnassociatedInvocationData.SyntacticArguments[index]);
         }
 
-        private void AssociateNameColonArgumentAtIndex(
+        private void PairNameColonArgumentAtIndex(
             int index,
             NameColonSyntax nameColonSyntax)
         {
@@ -228,29 +228,29 @@ public sealed class CSharpAttributeConstructorAssociator
             PairNormalArgument(parameterStatus.Symbol, UnassociatedInvocationData.SyntacticArguments[index]);
         }
 
-        private void AssociateParamsParameterArgumentAtIndex(
+        private void PairParamsParameterArgumentAtIndex(
             int index)
         {
             if (HasAtLeastConstructorArguments(index + 2))
             {
                 var syntacticArguments = CollectSyntacticParamsArgument(index);
 
-                AssociateParamsArgumentAtIndex(index, syntacticArguments);
+                PairParamsArgumentAtIndex(index, syntacticArguments);
 
                 return;
             }
 
             if (IsParamsArgument(index) is false)
             {
-                AssociateNormalArgumentAtIndex(index);
+                PairNormalArgumentAtIndex(index);
 
                 return;
             }
 
-            AssociateParamsArgumentAtIndex(index, [UnassociatedInvocationData.SyntacticArguments[index]]);
+            PairParamsArgumentAtIndex(index, [UnassociatedInvocationData.SyntacticArguments[index]]);
         }
 
-        private void AssociateParamsArgumentAtIndex(
+        private void PairParamsArgumentAtIndex(
             int index,
             IReadOnlyList<AttributeArgumentSyntax> syntacticArguments)
         {
