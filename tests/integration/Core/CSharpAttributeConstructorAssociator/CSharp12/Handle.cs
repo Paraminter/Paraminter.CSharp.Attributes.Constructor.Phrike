@@ -25,7 +25,7 @@ public sealed class Handle
     private readonly IFixture Fixture = FixtureFactory.Create();
 
     [Fact]
-    public void AttributeUsage_NormalArguments_AssociatesAll()
+    public void AttributeUsage_NormalArguments_PairsAll()
     {
         var source = """
             using System;
@@ -72,7 +72,7 @@ public sealed class Handle
     }
 
     [Fact]
-    public void AttributeUsage_ParamsArguments_AssociatesAll()
+    public void AttributeUsage_ParamsArguments_PairsAll()
     {
         var source = """
             using System;
@@ -117,7 +117,7 @@ public sealed class Handle
     }
 
     [Fact]
-    public void AttributeUsage_DefaultArgument_AssociatesAll()
+    public void AttributeUsage_DefaultArgument_PairsAll()
     {
         var source = """
             using System;
