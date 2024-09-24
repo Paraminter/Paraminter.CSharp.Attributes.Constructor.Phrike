@@ -1,4 +1,4 @@
-﻿namespace Paraminter.CSharp.Attributes.Constructor.Phrike;
+﻿namespace Paraminter.Associating.CSharp.Attributes.Constructor.Phrike;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -6,10 +6,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Moq;
 
 using Paraminter.Arguments.CSharp.Attributes.Constructor.Models;
-using Paraminter.Commands;
+using Paraminter.Associating.Commands;
+using Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Errors.Commands;
+using Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Models;
 using Paraminter.Cqs.Handlers;
-using Paraminter.CSharp.Attributes.Constructor.Phrike.Errors.Commands;
-using Paraminter.CSharp.Attributes.Constructor.Phrike.Models;
+using Paraminter.Pairing.Commands;
 using Paraminter.Parameters.Method.Models;
 
 using System;
@@ -48,7 +49,7 @@ public sealed class Handle
         var attributeSyntax = syntaxTree.GetRoot().DescendantNodes().OfType<AttributeSyntax>().Single();
         var syntacticArguments = attributeSyntax.ArgumentList!.Arguments;
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateArgumentsCommand<IAssociateCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup(static (command) => command.Data.Parameters).Returns(parameters);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
@@ -61,13 +62,13 @@ public sealed class Handle
         Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>()), Times.Never());
         Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>()), Times.Never());
 
-        Fixture.NormalIndividualAssociatorMock.Verify(AssociateIndividualNormalExpression(parameters[0], syntacticArguments[0]), Times.Once());
-        Fixture.NormalIndividualAssociatorMock.Verify(AssociateIndividualNormalExpression(parameters[1], syntacticArguments[1]), Times.Once());
-        Fixture.NormalIndividualAssociatorMock.Verify(AssociateIndividualNormalExpression(parameters[2], syntacticArguments[2]), Times.Once());
-        Fixture.NormalIndividualAssociatorMock.Verify(static (associator) => associator.Handle(It.IsAny<IAssociateSingleArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>()), Times.Exactly(3));
+        Fixture.NormalPairerMock.Verify(PairNormalArgumentExpression(parameters[0], syntacticArguments[0]), Times.Once());
+        Fixture.NormalPairerMock.Verify(PairNormalArgumentExpression(parameters[1], syntacticArguments[1]), Times.Once());
+        Fixture.NormalPairerMock.Verify(PairNormalArgumentExpression(parameters[2], syntacticArguments[2]), Times.Once());
+        Fixture.NormalPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>()), Times.Exactly(3));
 
-        Fixture.ParamsIndividualAssociatorMock.Verify(static (associator) => associator.Handle(It.IsAny<IAssociateSingleArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>()), Times.Never());
-        Fixture.DefaultIndividualAssociatorMock.Verify(static (associator) => associator.Handle(It.IsAny<IAssociateSingleArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>()), Times.Never());
+        Fixture.ParamsPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>()), Times.Never());
+        Fixture.DefaultPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>()), Times.Never());
     }
 
     [Fact]
@@ -95,7 +96,7 @@ public sealed class Handle
         var attributeSyntax = syntaxTree.GetRoot().DescendantNodes().OfType<AttributeSyntax>().Single();
         var syntacticArguments = attributeSyntax.ArgumentList!.Arguments;
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateArgumentsCommand<IAssociateCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup(static (command) => command.Data.Parameters).Returns(parameters);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
@@ -108,11 +109,11 @@ public sealed class Handle
         Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>()), Times.Never());
         Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>()), Times.Never());
 
-        Fixture.ParamsIndividualAssociatorMock.Verify(AssociateIndividualParamsExpression(parameters[0], syntacticArguments), Times.Once());
-        Fixture.ParamsIndividualAssociatorMock.Verify(static (associator) => associator.Handle(It.IsAny<IAssociateSingleArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>()), Times.Exactly(1));
+        Fixture.ParamsPairerMock.Verify(PairParamsArgumentExpression(parameters[0], syntacticArguments), Times.Once());
+        Fixture.ParamsPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>()), Times.Exactly(1));
 
-        Fixture.NormalIndividualAssociatorMock.Verify(static (associator) => associator.Handle(It.IsAny<IAssociateSingleArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>()), Times.Never());
-        Fixture.DefaultIndividualAssociatorMock.Verify(static (assoacitor) => assoacitor.Handle(It.IsAny<IAssociateSingleArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>()), Times.Never());
+        Fixture.NormalPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>()), Times.Never());
+        Fixture.DefaultPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>()), Times.Never());
     }
 
     [Fact]
@@ -135,7 +136,7 @@ public sealed class Handle
         var type = compilation.GetTypeByMetadataName("Foo")!;
         var parameters = type.GetAttributes()[0].AttributeConstructor!.Parameters;
 
-        Mock<IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData>> commandMock = new();
+        Mock<IAssociateArgumentsCommand<IAssociateCSharpAttributeConstructorArgumentsData>> commandMock = new();
 
         commandMock.Setup((query) => query.Data.Parameters).Returns(parameters);
         commandMock.Setup((query) => query.Data.SyntacticArguments).Returns([]);
@@ -148,48 +149,48 @@ public sealed class Handle
         Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>()), Times.Never());
         Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>()), Times.Never());
 
-        Fixture.DefaultIndividualAssociatorMock.Verify(AssociateIndividualDefaultExpression(parameters[0]), Times.Once());
-        Fixture.DefaultIndividualAssociatorMock.Verify(static (associator) => associator.Handle(It.IsAny<IAssociateSingleArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>()), Times.Exactly(1));
+        Fixture.DefaultPairerMock.Verify(PairDefaultArgumentExpression(parameters[0]), Times.Once());
+        Fixture.DefaultPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>()), Times.Exactly(1));
 
-        Fixture.NormalIndividualAssociatorMock.Verify(static (associator) => associator.Handle(It.IsAny<IAssociateSingleArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>()), Times.Never());
-        Fixture.ParamsIndividualAssociatorMock.Verify(static (associator) => associator.Handle(It.IsAny<IAssociateSingleArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>()), Times.Never());
+        Fixture.NormalPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>()), Times.Never());
+        Fixture.ParamsPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>()), Times.Never());
     }
 
-    private static Expression<Action<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>>> AssociateIndividualNormalExpression(
+    private static Expression<Action<ICommandHandler<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>>> PairNormalArgumentExpression(
         IParameterSymbol parameterSymbol,
         AttributeArgumentSyntax syntacticArgument)
     {
-        return (associator) => associator.Handle(It.Is(MatchAssociateIndividualNormalCommand(parameterSymbol, syntacticArgument)));
+        return (handler) => handler.Handle(It.Is(MatchPairNormalArgumentCommand(parameterSymbol, syntacticArgument)));
     }
 
-    private static Expression<Func<IAssociateSingleArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>, bool>> MatchAssociateIndividualNormalCommand(
+    private static Expression<Func<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>, bool>> MatchPairNormalArgumentCommand(
         IParameterSymbol parameterSymbol,
         AttributeArgumentSyntax syntacticArgument)
     {
         return (command) => MatchParameter(parameterSymbol, command.Parameter) && MatchNormalArgumentData(syntacticArgument, command.ArgumentData);
     }
 
-    private static Expression<Action<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>>> AssociateIndividualParamsExpression(
+    private static Expression<Action<ICommandHandler<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>>> PairParamsArgumentExpression(
         IParameterSymbol parameterSymbol,
         IReadOnlyList<AttributeArgumentSyntax> syntacticArguments)
     {
-        return (associator) => associator.Handle(It.Is(MatchAssociateIndividualParamsCommand(parameterSymbol, syntacticArguments)));
+        return (handler) => handler.Handle(It.Is(MatchPairParamsArgumentCommand(parameterSymbol, syntacticArguments)));
     }
 
-    private static Expression<Func<IAssociateSingleArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>, bool>> MatchAssociateIndividualParamsCommand(
+    private static Expression<Func<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>, bool>> MatchPairParamsArgumentCommand(
         IParameterSymbol parameterSymbol,
         IReadOnlyList<AttributeArgumentSyntax> syntacticArguments)
     {
         return (command) => MatchParameter(parameterSymbol, command.Parameter) && MatchParamsArgumentData(syntacticArguments, command.ArgumentData);
     }
 
-    private static Expression<Action<ICommandHandler<IAssociateSingleArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>>> AssociateIndividualDefaultExpression(
+    private static Expression<Action<ICommandHandler<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>>> PairDefaultArgumentExpression(
         IParameterSymbol parameterSymbol)
     {
-        return (associator) => associator.Handle(It.Is(MatchAssociateIndividualDefaultCommand(parameterSymbol)));
+        return (handler) => handler.Handle(It.Is(MatchPairDefaultArgumentCommand(parameterSymbol)));
     }
 
-    private static Expression<Func<IAssociateSingleArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>, bool>> MatchAssociateIndividualDefaultCommand(
+    private static Expression<Func<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>, bool>> MatchPairDefaultArgumentCommand(
         IParameterSymbol parameterSymbol)
     {
         return (command) => MatchParameter(parameterSymbol, command.Parameter);
@@ -217,7 +218,7 @@ public sealed class Handle
     }
 
     private void Target(
-        IAssociateAllArgumentsCommand<IAssociateAllCSharpAttributeConstructorArgumentsData> command)
+        IAssociateArgumentsCommand<IAssociateCSharpAttributeConstructorArgumentsData> command)
     {
         Fixture.Sut.Handle(command);
     }
