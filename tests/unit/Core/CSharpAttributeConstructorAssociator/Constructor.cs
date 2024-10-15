@@ -5,7 +5,7 @@ using Moq;
 using Paraminter.Arguments.CSharp.Attributes.Constructor.Models;
 using Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Errors;
 using Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Queries;
-using Paraminter.Cqs.Handlers;
+using Paraminter.Cqs;
 using Paraminter.Pairing.Commands;
 using Paraminter.Parameters.Method.Models;
 
