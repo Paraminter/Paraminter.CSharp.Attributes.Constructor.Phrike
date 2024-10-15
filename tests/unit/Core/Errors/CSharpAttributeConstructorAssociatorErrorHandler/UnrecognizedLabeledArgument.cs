@@ -1,7 +1,7 @@
 ﻿namespace Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Errors;
 
 using Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Errors.Commands;
-using Paraminter.Cqs.Handlers;
+using Paraminter.Cqs;
 
 using Xunit;
 

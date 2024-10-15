@@ -3,7 +3,7 @@
 using Moq;
 
 using Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Errors.Commands;
-using Paraminter.Cqs.Handlers;
+using Paraminter.Cqs;
 
 internal interface IFixture
 {
