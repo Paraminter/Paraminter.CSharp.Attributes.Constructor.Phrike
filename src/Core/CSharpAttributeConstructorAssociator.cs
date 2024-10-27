@@ -17,6 +17,8 @@ using Paraminter.Parameters.Method.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 /// <summary>Associates syntactic C# attribute constructor arguments with parameters.</summary>
 public sealed class CSharpAttributeConstructorAssociator
@@ -52,30 +54,32 @@ public sealed class CSharpAttributeConstructorAssociator
         ErrorHandler = errorHandler ?? throw new ArgumentNullException(nameof(errorHandler));
     }
 
-    void ICommandHandler<IAssociateArgumentsCommand<IAssociateCSharpAttributeConstructorArgumentsData>>.Handle(
-        IAssociateArgumentsCommand<IAssociateCSharpAttributeConstructorArgumentsData> command)
+    async Task ICommandHandler<IAssociateArgumentsCommand<IAssociateCSharpAttributeConstructorArgumentsData>>.Handle(
+        IAssociateArgumentsCommand<IAssociateCSharpAttributeConstructorArgumentsData> command,
+        CancellationToken cancellationToken)
     {
         if (command is null)
         {
             throw new ArgumentNullException(nameof(command));
         }
 
-        Associator.Associate(NormalPairer, ParamsPairer, DefaultPairer, ParamsArgumentDistinguisher, ErrorHandler, command);
+        await Associator.Associate(NormalPairer, ParamsPairer, DefaultPairer, ParamsArgumentDistinguisher, ErrorHandler, command, cancellationToken);
     }
 
     private sealed class Associator
     {
-        public static void Associate(
+        public static async Task Associate(
             ICommandHandler<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>> normalPairer,
             ICommandHandler<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>> paramsPairer,
             ICommandHandler<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>> defaultPairer,
             IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool> paramsArgumentDistinguisher,
             ICSharpAttributeConstructorAssociatorErrorHandler errorHandler,
-            IAssociateArgumentsCommand<IAssociateCSharpAttributeConstructorArgumentsData> command)
+            IAssociateArgumentsCommand<IAssociateCSharpAttributeConstructorArgumentsData> command,
+            CancellationToken cancellationToken)
         {
-            var associator = new Associator(normalPairer, paramsPairer, defaultPairer, paramsArgumentDistinguisher, errorHandler, command);
+            var associator = new Associator(normalPairer, paramsPairer, defaultPairer, paramsArgumentDistinguisher, errorHandler, command, cancellationToken);
 
-            associator.Associate();
+            await associator.Associate();
         }
 
         private readonly ICommandHandler<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>> NormalPairer;
@@ -90,6 +94,8 @@ public sealed class CSharpAttributeConstructorAssociator
 
         private readonly IDictionary<string, ParameterStatus> ParametersByName;
 
+        private readonly CancellationToken CancellationToken;
+
         private bool HasEncounteredOutOfOrderLabelledArgument;
         private bool HasEncounteredParamsArgument;
         private bool HasEncounteredNamedArgument;
@@ -100,7 +106,8 @@ public sealed class CSharpAttributeConstructorAssociator
             ICommandHandler<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>> defaultPairer,
             IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool> paramsArgumentDistinguisher,
             ICSharpAttributeConstructorAssociatorErrorHandler errorHandler,
-            IAssociateArgumentsCommand<IAssociateCSharpAttributeConstructorArgumentsData> command)
+            IAssociateArgumentsCommand<IAssociateCSharpAttributeConstructorArgumentsData> command,
+            CancellationToken cancellationToken)
         {
             NormalPairer = normalPairer;
             ParamsPairer = paramsPairer;
@@ -113,23 +120,25 @@ public sealed class CSharpAttributeConstructorAssociator
             UnassociatedInvocationData = command.Data;
 
             ParametersByName = new Dictionary<string, ParameterStatus>(command.Data.Parameters.Count, StringComparer.Ordinal);
+
+            CancellationToken = cancellationToken;
         }
 
-        private void Associate()
+        private async Task Associate()
         {
-            ResetParametersByNameDictionary();
+            await ResetParametersByNameDictionary().ConfigureAwait(false);
 
-            PairSpecifiedArguments();
-            ValidateUnpairedArguments();
+            await PairSpecifiedArguments().ConfigureAwait(false);
+            await ValidateUnpairedArguments().ConfigureAwait(false);
         }
 
-        private void PairSpecifiedArguments()
+        private async Task PairSpecifiedArguments()
         {
             var maximumNumberOfSpecifiedArguments = Math.Min(UnassociatedInvocationData.Parameters.Count, UnassociatedInvocationData.SyntacticArguments.Count);
 
             for (var i = 0; i < maximumNumberOfSpecifiedArguments; i++)
             {
-                PairArgumentAtIndex(i);
+                await PairArgumentAtIndex(i).ConfigureAwait(false);
 
                 if (HasEncounteredParamsArgument || HasEncounteredNamedArgument)
                 {
@@ -138,7 +147,7 @@ public sealed class CSharpAttributeConstructorAssociator
             }
         }
 
-        private void ValidateUnpairedArguments()
+        private async Task ValidateUnpairedArguments()
         {
             var unpairedParameters = ParametersByName.Values.Where(static (parsableParameter) => parsableParameter.HasBeenPaired is false);
 
@@ -146,23 +155,23 @@ public sealed class CSharpAttributeConstructorAssociator
             {
                 if (parameterSymbol.IsOptional)
                 {
-                    PairDefaultArgument(parameterSymbol);
+                    await PairDefaultArgument(parameterSymbol).ConfigureAwait(false);
 
                     continue;
                 }
 
                 if (parameterSymbol.IsParams)
                 {
-                    PairParamsArgument(parameterSymbol, []);
+                    await PairParamsArgument(parameterSymbol, []).ConfigureAwait(false);
 
                     continue;
                 }
 
-                HandleMissingRequiredArgument(parameterSymbol);
+                await HandleMissingRequiredArgument(parameterSymbol).ConfigureAwait(false);
             }
         }
 
-        private void PairArgumentAtIndex(
+        private async Task PairArgumentAtIndex(
             int index)
         {
             if (UnassociatedInvocationData.SyntacticArguments[index].NameEquals is not null)
@@ -174,35 +183,35 @@ public sealed class CSharpAttributeConstructorAssociator
 
             if (UnassociatedInvocationData.SyntacticArguments[index].NameColon is NameColonSyntax nameColonSyntax)
             {
-                PairNameColonArgumentAtIndex(index, nameColonSyntax);
+                await PairNameColonArgumentAtIndex(index, nameColonSyntax).ConfigureAwait(false);
 
                 return;
             }
 
             if (HasEncounteredOutOfOrderLabelledArgument)
             {
-                HandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand(UnassociatedInvocationData.SyntacticArguments[index]);
+                await HandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand(UnassociatedInvocationData.SyntacticArguments[index]).ConfigureAwait(false);
 
                 return;
             }
 
             if (UnassociatedInvocationData.Parameters[index].IsParams)
             {
-                PairParamsParameterArgumentAtIndex(index);
+                await PairParamsParameterArgumentAtIndex(index).ConfigureAwait(false);
 
                 return;
             }
 
-            PairNormalArgumentAtIndex(index);
+            await PairNormalArgumentAtIndex(index).ConfigureAwait(false);
         }
 
-        private void PairNormalArgumentAtIndex(
+        private async Task PairNormalArgumentAtIndex(
             int index)
         {
-            PairNormalArgument(UnassociatedInvocationData.Parameters[index], UnassociatedInvocationData.SyntacticArguments[index]);
+            await PairNormalArgument(UnassociatedInvocationData.Parameters[index], UnassociatedInvocationData.SyntacticArguments[index]).ConfigureAwait(false);
         }
 
-        private void PairNameColonArgumentAtIndex(
+        private async Task PairNameColonArgumentAtIndex(
             int index,
             NameColonSyntax nameColonSyntax)
         {
@@ -213,51 +222,51 @@ public sealed class CSharpAttributeConstructorAssociator
 
             if (ParametersByName.TryGetValue(nameColonSyntax.Name.Identifier.Text, out var parameterStatus) is false)
             {
-                HandleUnrecognizedLabeledArgumentCommand(UnassociatedInvocationData.SyntacticArguments[index]);
+                await HandleUnrecognizedLabeledArgumentCommand(UnassociatedInvocationData.SyntacticArguments[index]).ConfigureAwait(false);
 
                 return;
             }
 
             if (parameterStatus.HasBeenPaired)
             {
-                HandleDuplicateArgumentsCommand(parameterStatus.Symbol, UnassociatedInvocationData.SyntacticArguments[index]);
+                await HandleDuplicateArgumentsCommand(parameterStatus.Symbol, UnassociatedInvocationData.SyntacticArguments[index]).ConfigureAwait(false);
 
                 return;
             }
 
-            PairNormalArgument(parameterStatus.Symbol, UnassociatedInvocationData.SyntacticArguments[index]);
+            await PairNormalArgument(parameterStatus.Symbol, UnassociatedInvocationData.SyntacticArguments[index]).ConfigureAwait(false);
         }
 
-        private void PairParamsParameterArgumentAtIndex(
+        private async Task PairParamsParameterArgumentAtIndex(
             int index)
         {
             if (HasAtLeastConstructorArguments(index + 2))
             {
                 var syntacticArguments = CollectSyntacticParamsArgument(index);
 
-                PairParamsArgumentAtIndex(index, syntacticArguments);
+                await PairParamsArgumentAtIndex(index, syntacticArguments).ConfigureAwait(false);
 
                 return;
             }
 
-            if (IsParamsArgument(index) is false)
+            if (await IsParamsArgument(index).ConfigureAwait(false) is false)
             {
-                PairNormalArgumentAtIndex(index);
+                await PairNormalArgumentAtIndex(index).ConfigureAwait(false);
 
                 return;
             }
 
-            PairParamsArgumentAtIndex(index, [UnassociatedInvocationData.SyntacticArguments[index]]);
+            await PairParamsArgumentAtIndex(index, [UnassociatedInvocationData.SyntacticArguments[index]]).ConfigureAwait(false);
         }
 
-        private void PairParamsArgumentAtIndex(
+        private async Task PairParamsArgumentAtIndex(
             int index,
             IReadOnlyList<AttributeArgumentSyntax> syntacticArguments)
         {
-            PairParamsArgument(UnassociatedInvocationData.Parameters[index], syntacticArguments);
+            await PairParamsArgument(UnassociatedInvocationData.Parameters[index], syntacticArguments).ConfigureAwait(false);
         }
 
-        private void ResetParametersByNameDictionary()
+        private async Task ResetParametersByNameDictionary()
         {
             ParametersByName.Clear();
 
@@ -265,7 +274,7 @@ public sealed class CSharpAttributeConstructorAssociator
             {
                 if (ParametersByName.ContainsKey(parameterSymbol.Name))
                 {
-                    HandleDuplicateParameterNamesCommand(parameterSymbol.Name);
+                    await HandleDuplicateParameterNamesCommand(parameterSymbol.Name).ConfigureAwait(false);
 
                     continue;
                 }
@@ -300,15 +309,15 @@ public sealed class CSharpAttributeConstructorAssociator
             return UnassociatedInvocationData.SyntacticArguments.Count >= amount && UnassociatedInvocationData.SyntacticArguments[amount - 1].NameEquals is null;
         }
 
-        private bool IsParamsArgument(
+        private async Task<bool> IsParamsArgument(
             int index)
         {
             var query = new IsCSharpAttributeConstructorArgumentParamsQuery(UnassociatedInvocationData.Parameters[index], UnassociatedInvocationData.SyntacticArguments[index], UnassociatedInvocationData.SemanticModel);
 
-            return ParamsArgumentDistinguisher.Handle(query);
+            return await ParamsArgumentDistinguisher.Handle(query, CancellationToken).ConfigureAwait(false);
         }
 
-        private void PairNormalArgument(
+        private async Task PairNormalArgument(
             IParameterSymbol parameterSymbol,
             AttributeArgumentSyntax syntacticArgument)
         {
@@ -317,12 +326,12 @@ public sealed class CSharpAttributeConstructorAssociator
 
             var command = PairArgumentCommandFactory.Create(parameter, argumentData);
 
-            NormalPairer.Handle(command);
+            await NormalPairer.Handle(command, CancellationToken).ConfigureAwait(false);
 
             ParametersByName[parameterSymbol.Name] = new ParameterStatus(parameterSymbol, true);
         }
 
-        private void PairParamsArgument(
+        private async Task PairParamsArgument(
             IParameterSymbol parameterSymbol,
             IReadOnlyList<AttributeArgumentSyntax> syntacticArguments)
         {
@@ -331,14 +340,14 @@ public sealed class CSharpAttributeConstructorAssociator
 
             var command = PairArgumentCommandFactory.Create(parameter, argumentData);
 
-            ParamsPairer.Handle(command);
+            await ParamsPairer.Handle(command, CancellationToken).ConfigureAwait(false);
 
             ParametersByName[parameterSymbol.Name] = new ParameterStatus(parameterSymbol, true);
 
             HasEncounteredParamsArgument = true;
         }
 
-        private void PairDefaultArgument(
+        private async Task PairDefaultArgument(
             IParameterSymbol parameterSymbol)
         {
             var parameter = new MethodParameter(parameterSymbol);
@@ -346,46 +355,46 @@ public sealed class CSharpAttributeConstructorAssociator
 
             var command = PairArgumentCommandFactory.Create(parameter, argumentData);
 
-            DefaultPairer.Handle(command);
+            await DefaultPairer.Handle(command, CancellationToken).ConfigureAwait(false);
 
             ParametersByName[parameterSymbol.Name] = new ParameterStatus(parameterSymbol, true);
         }
 
-        private void HandleMissingRequiredArgument(
+        private async Task HandleMissingRequiredArgument(
             IParameterSymbol parameterSymbol)
         {
             var parameter = new MethodParameter(parameterSymbol);
 
             var command = new HandleMissingRequiredArgumentCommand(parameter);
 
-            ErrorHandler.MissingRequiredArgument.Handle(command);
+            await ErrorHandler.MissingRequiredArgument.Handle(command, CancellationToken).ConfigureAwait(false);
         }
 
-        private void HandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand(
+        private async Task HandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand(
             AttributeArgumentSyntax syntacticUnlabeledArgument)
         {
             var command = new HandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand(syntacticUnlabeledArgument);
 
-            ErrorHandler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(command);
+            await ErrorHandler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(command, CancellationToken).ConfigureAwait(false);
         }
 
-        private void HandleUnrecognizedLabeledArgumentCommand(
+        private async Task HandleUnrecognizedLabeledArgumentCommand(
             AttributeArgumentSyntax syntacticArgument)
         {
             var command = new HandleUnrecognizedLabeledArgumentCommand(syntacticArgument);
 
-            ErrorHandler.UnrecognizedLabeledArgument.Handle(command);
+            await ErrorHandler.UnrecognizedLabeledArgument.Handle(command, CancellationToken).ConfigureAwait(false);
         }
 
-        private void HandleDuplicateParameterNamesCommand(
+        private async Task HandleDuplicateParameterNamesCommand(
            string parameterName)
         {
             var command = new HandleDuplicateParameterNamesCommand(parameterName);
 
-            ErrorHandler.DuplicateParameterNames.Handle(command);
+            await ErrorHandler.DuplicateParameterNames.Handle(command, CancellationToken).ConfigureAwait(false);
         }
 
-        private void HandleDuplicateArgumentsCommand(
+        private async Task HandleDuplicateArgumentsCommand(
             IParameterSymbol parameterSymbol,
             AttributeArgumentSyntax syntacticArgument)
         {
@@ -393,7 +402,7 @@ public sealed class CSharpAttributeConstructorAssociator
 
             var command = new HandleDuplicateArgumentsCommand(parameter, syntacticArgument);
 
-            ErrorHandler.DuplicateArguments.Handle(command);
+            await ErrorHandler.DuplicateArguments.Handle(command, CancellationToken).ConfigureAwait(false);
         }
 
         private readonly struct ParameterStatus
