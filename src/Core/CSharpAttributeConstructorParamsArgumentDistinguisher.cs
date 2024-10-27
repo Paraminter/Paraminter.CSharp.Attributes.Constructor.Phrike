@@ -6,6 +6,8 @@ using Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Queries;
 using Paraminter.Cqs;
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 /// <summary>Distinguishes between <see langword="params"/> and non-<see langword="params"/> syntactic C# attribute constructor arguments.</summary>
 public sealed class CSharpAttributeConstructorParamsArgumentDistinguisher
@@ -14,8 +16,9 @@ public sealed class CSharpAttributeConstructorParamsArgumentDistinguisher
     /// <summary>Instantiates a <see cref="CSharpAttributeConstructorParamsArgumentDistinguisher"/>, distinguishing between <see langword="params"/> and non-<see langword="params"/> syntactic C# attribute constructor arguments.</summary>
     public CSharpAttributeConstructorParamsArgumentDistinguisher() { }
 
-    bool IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool>.Handle(
-        IIsCSharpAttributeConstructorArgumentParamsQuery query)
+    async Task<bool> IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool>.Handle(
+        IIsCSharpAttributeConstructorArgumentParamsQuery query,
+        CancellationToken cancellationToken)
     {
         if (query is null)
         {
@@ -34,6 +37,6 @@ public sealed class CSharpAttributeConstructorParamsArgumentDistinguisher
 
         var expressedType = query.SemanticModel.GetTypeInfo(query.SyntacticArgument.Expression);
 
-        return SymbolEqualityComparer.Default.Equals(expressedType.ConvertedType, arrayType.ElementType);
+        return await Task.FromResult(SymbolEqualityComparer.Default.Equals(expressedType.ConvertedType, arrayType.ElementType));
     }
 }

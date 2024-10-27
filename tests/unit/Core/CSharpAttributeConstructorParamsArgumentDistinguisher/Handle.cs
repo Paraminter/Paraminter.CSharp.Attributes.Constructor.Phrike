@@ -8,7 +8,8 @@ using Moq;
 using Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Queries;
 
 using System;
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Xunit;
 
@@ -17,15 +18,15 @@ public sealed class Handle
     private readonly IFixture Fixture = FixtureFactory.Create();
 
     [Fact]
-    public void NullQuery_ThrowsArgumentNullException()
+    public async Task NullQuery_ThrowsArgumentNullException()
     {
-        var result = Record.Exception(() => Target(null!));
+        var result = await Record.ExceptionAsync(() => Target(null!, CancellationToken.None));
 
         Assert.IsType<ArgumentNullException>(result);
     }
 
     [Fact]
-    public void NotParamsParameter_ReturnsFalse()
+    public async Task NotParamsParameter_ReturnsFalse()
     {
         Mock<IParameterSymbol> parameterMock = new() { DefaultValue = DefaultValue.Mock };
 
@@ -35,13 +36,13 @@ public sealed class Handle
 
         queryMock.Setup(static (query) => query.Parameter).Returns(parameterMock.Object);
 
-        var result = Target(queryMock.Object);
+        var result = await Target(queryMock.Object, CancellationToken.None);
 
         Assert.False(result);
     }
 
     [Fact]
-    public void NotArraySymbol_ReturnsFalse()
+    public async Task NotArraySymbol_ReturnsFalse()
     {
         Mock<IParameterSymbol> parameterMock = new() { DefaultValue = DefaultValue.Mock };
 
@@ -51,13 +52,13 @@ public sealed class Handle
 
         queryMock.Setup(static (query) => query.Parameter).Returns(parameterMock.Object);
 
-        var result = Target(queryMock.Object);
+        var result = await Target(queryMock.Object, CancellationToken.None);
 
         Assert.False(result);
     }
 
     [Fact]
-    public void ArgumentNotOfElementType_ReturnsFalse()
+    public async Task ArgumentNotOfElementType_ReturnsFalse()
     {
         var source = """
             using System;
@@ -71,11 +72,11 @@ public sealed class Handle
             public class Foo { }
             """;
 
-        ReturnsValue(source, false);
+        await ReturnsValue(source, false, CancellationToken.None);
     }
 
     [Fact]
-    public void ArgumentOfElementType_ReturnsTrue()
+    public async Task ArgumentOfElementType_ReturnsTrue()
     {
         var source = """
             using System;
@@ -89,29 +90,31 @@ public sealed class Handle
             public class Foo { }
             """;
 
-        ReturnsValue(source, true);
+        await ReturnsValue(source, true, CancellationToken.None);
     }
 
-    private bool Target(
-        IIsCSharpAttributeConstructorArgumentParamsQuery query)
+    private async Task<bool> Target(
+        IIsCSharpAttributeConstructorArgumentParamsQuery query,
+        CancellationToken cancellationToken)
     {
-        return Fixture.Sut.Handle(query);
+        return await Fixture.Sut.Handle(query, cancellationToken);
     }
 
-    private void ReturnsValue(
+    private async Task ReturnsValue(
         string source,
-        bool expected)
+        bool expected,
+        CancellationToken cancellationToken)
     {
         var compilation = CompilationFactory.Create(source);
 
-        var type = compilation.GetTypeByMetadataName("Foo")!;
-        var parameters = type.GetAttributes()[0].AttributeConstructor!.Parameters;
+        var attribute = compilation.GetTypeByMetadataName("Foo")!.GetAttributes()[0];
 
-        var syntaxTree = compilation.SyntaxTrees[0];
-        var semanticModel = compilation.GetSemanticModel(syntaxTree);
+        var parameters = attribute.AttributeConstructor!.Parameters;
 
-        var attributeSyntax = syntaxTree.GetRoot().DescendantNodes().OfType<AttributeSyntax>().Single();
+        var attributeSyntax = (AttributeSyntax)await attribute.ApplicationSyntaxReference!.GetSyntaxAsync(CancellationToken.None);
         var syntacticArguments = attributeSyntax.ArgumentList!.Arguments;
+
+        var semanticModel = compilation.GetSemanticModel(attributeSyntax.SyntaxTree);
 
         Mock<IIsCSharpAttributeConstructorArgumentParamsQuery> queryMock = new();
 
@@ -119,7 +122,7 @@ public sealed class Handle
         queryMock.Setup(static (query) => query.SyntacticArgument).Returns(syntacticArguments[0]);
         queryMock.Setup(static (query) => query.SemanticModel).Returns(semanticModel);
 
-        var result = Target(queryMock.Object);
+        var result = await Target(queryMock.Object, cancellationToken);
 
         Assert.Equal(expected, result);
     }

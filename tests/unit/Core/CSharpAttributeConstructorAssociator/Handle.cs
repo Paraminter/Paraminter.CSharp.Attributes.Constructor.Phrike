@@ -20,6 +20,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Xunit;
 
@@ -28,15 +30,15 @@ public sealed class Handle
     private readonly IFixture Fixture = FixtureFactory.Create();
 
     [Fact]
-    public void NullCommand_ThrowsArgumentNullException()
+    public async Task NullCommand_ThrowsArgumentNullException()
     {
-        var result = Record.Exception(() => Target(null!));
+        var result = await Record.ExceptionAsync(() => Target(null!, CancellationToken.None));
 
         Assert.IsType<ArgumentNullException>(result);
     }
 
     [Fact]
-    public void MissingRequiredArgument_HandlesError()
+    public async Task MissingRequiredArgument_HandlesError()
     {
         Mock<IParameterSymbol> parameterSymbolMock = new();
 
@@ -49,17 +51,17 @@ public sealed class Handle
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameterSymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns([]);
 
-        Target(commandMock.Object);
+        await Target(commandMock.Object, CancellationToken.None);
 
-        Fixture.ErrorHandlerMock.Verify(HandleMissingRequiredArgumentExpression(parameterSymbolMock.Object), Times.Once());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(HandleMissingRequiredArgumentExpression(parameterSymbolMock.Object, It.IsAny<CancellationToken>()), Times.Once());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
-    public void OutOfOrderLabelledArgumentFollowedByUnlabelled_HandlesError()
+    public async Task OutOfOrderLabelledArgumentFollowedByUnlabelled_HandlesError()
     {
         var syntacticArguments = SyntaxFactory.AttributeArgumentList(SyntaxFactory.SeparatedList([
             SyntaxFactory.AttributeArgument(null, SyntaxFactory.NameColon("_2"), SyntaxFactory.ParseExpression("42")),
@@ -82,17 +84,17 @@ public sealed class Handle
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameter1SymbolMock.Object, parameter2SymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
 
-        Target(commandMock.Object);
+        await Target(commandMock.Object, CancellationToken.None);
 
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(HandleOutOfOrderLabeledArgumentFollowedByUnlabeledExpression(syntacticArguments[1]), Times.Once());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(HandleOutOfOrderLabeledArgumentFollowedByUnlabeledExpression(syntacticArguments[1], It.IsAny<CancellationToken>()), Times.Once());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
-    public void ArgumentForNonExistingParameter_HandlesError()
+    public async Task ArgumentForNonExistingParameter_HandlesError()
     {
         var syntacticArguments = SyntaxFactory.AttributeArgumentList(SyntaxFactory.SeparatedList([
             SyntaxFactory.AttributeArgument(null, SyntaxFactory.NameColon("_1"), SyntaxFactory.ParseExpression("42"))
@@ -108,17 +110,17 @@ public sealed class Handle
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameterSymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
 
-        Target(commandMock.Object);
+        await Target(commandMock.Object, CancellationToken.None);
 
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(HandleUnrecognizedLabeledArgumentExpression(syntacticArguments[0]), Times.Once());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(HandleUnrecognizedLabeledArgumentExpression(syntacticArguments[0], It.IsAny<CancellationToken>()), Times.Once());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
-    public void DuplicateParameter_HandlesError()
+    public async Task DuplicateParameter_HandlesError()
     {
         var parameterName = "Foo";
 
@@ -136,17 +138,17 @@ public sealed class Handle
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameter1SymbolMock.Object, parameter2SymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns([]);
 
-        Target(commandMock.Object);
+        await Target(commandMock.Object, CancellationToken.None);
 
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(HandleDuplicateParameterNamesExpression(parameterName), Times.Once());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(HandleDuplicateParameterNamesExpression(parameterName, It.IsAny<CancellationToken>()), Times.Once());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
-    public void MultipleArgumentsForParameter_HandlesError()
+    public async Task MultipleArgumentsForParameter_HandlesError()
     {
         var syntacticArguments = SyntaxFactory.AttributeArgumentList(SyntaxFactory.SeparatedList([
             SyntaxFactory.AttributeArgument(null, SyntaxFactory.NameColon("_1"), SyntaxFactory.ParseExpression("42")),
@@ -169,17 +171,17 @@ public sealed class Handle
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameter1SymbolMock.Object, parameter2SymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
 
-        Target(commandMock.Object);
+        await Target(commandMock.Object, CancellationToken.None);
 
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(HandleDuplicateArgumentsExpression(parameter1SymbolMock.Object, syntacticArguments[1]), Times.Once());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(HandleDuplicateArgumentsExpression(parameter1SymbolMock.Object, syntacticArguments[1], It.IsAny<CancellationToken>()), Times.Once());
     }
 
     [Fact]
-    public void UnspecifiedOptionalArguments_NamedArguments_PairsDefaultArguments()
+    public async Task UnspecifiedOptionalArguments_NamedArguments_PairsDefaultArguments()
     {
         var syntacticArguments = SyntaxFactory.AttributeArgumentList(SyntaxFactory.SeparatedList([
             SyntaxFactory.AttributeArgument(SyntaxFactory.NameEquals("_1"), null, SyntaxFactory.ParseExpression("42")),
@@ -202,24 +204,24 @@ public sealed class Handle
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameter1SymbolMock.Object, parameter2SymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
 
-        Target(commandMock.Object);
+        await Target(commandMock.Object, CancellationToken.None);
 
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>(), It.IsAny<CancellationToken>()), Times.Never());
 
-        Fixture.DefaultPairerMock.Verify(PairDefaultArgumentExpression(parameter1SymbolMock.Object), Times.Once());
-        Fixture.DefaultPairerMock.Verify(PairDefaultArgumentExpression(parameter2SymbolMock.Object), Times.Once());
-        Fixture.DefaultPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>()), Times.Exactly(2));
+        Fixture.DefaultPairerMock.Verify(PairDefaultArgumentExpression(parameter1SymbolMock.Object, It.IsAny<CancellationToken>()), Times.Once());
+        Fixture.DefaultPairerMock.Verify(PairDefaultArgumentExpression(parameter2SymbolMock.Object, It.IsAny<CancellationToken>()), Times.Once());
+        Fixture.DefaultPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
 
-        Fixture.NormalPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>()), Times.Never());
-        Fixture.ParamsPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>()), Times.Never());
+        Fixture.NormalPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ParamsPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
-    public void ValidNormalArgument_PairsNormalArgument()
+    public async Task ValidNormalArgument_PairsNormalArgument()
     {
         var syntacticArguments = SyntaxFactory.AttributeArgumentList(SyntaxFactory.SeparatedList([
             SyntaxFactory.AttributeArgument(SyntaxFactory.ParseExpression("42"))
@@ -236,23 +238,23 @@ public sealed class Handle
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameterSymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
 
-        Target(commandMock.Object);
+        await Target(commandMock.Object, CancellationToken.None);
 
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>(), It.IsAny<CancellationToken>()), Times.Never());
 
-        Fixture.NormalPairerMock.Verify(PairNormalArgumentExpression(parameterSymbolMock.Object, syntacticArguments[0]), Times.Once());
-        Fixture.NormalPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>()), Times.Once());
+        Fixture.NormalPairerMock.Verify(PairNormalArgumentExpression(parameterSymbolMock.Object, syntacticArguments[0], It.IsAny<CancellationToken>()), Times.Once());
+        Fixture.NormalPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Once());
 
-        Fixture.ParamsPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>()), Times.Never());
-        Fixture.DefaultPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>()), Times.Never());
+        Fixture.ParamsPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.DefaultPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
-    public void UnspecifiedParamsArgument_PairsEmptyArray()
+    public async Task UnspecifiedParamsArgument_PairsEmptyArray()
     {
         Mock<IParameterSymbol> parameterSymbolMock = new();
 
@@ -265,23 +267,23 @@ public sealed class Handle
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameterSymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns([]);
 
-        Target(commandMock.Object);
+        await Target(commandMock.Object, CancellationToken.None);
 
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>(), It.IsAny<CancellationToken>()), Times.Never());
 
-        Fixture.ParamsPairerMock.Verify(PairParamsArgumentExpression(parameterSymbolMock.Object, []), Times.Once());
-        Fixture.ParamsPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>()), Times.Once());
+        Fixture.ParamsPairerMock.Verify(PairParamsArgumentExpression(parameterSymbolMock.Object, [], It.IsAny<CancellationToken>()), Times.Once());
+        Fixture.ParamsPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Once());
 
-        Fixture.NormalPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>()), Times.Never());
-        Fixture.DefaultPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>()), Times.Never());
+        Fixture.NormalPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.DefaultPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
-    public void MultipleParamsArguments_PairsParamsArguments()
+    public async Task MultipleParamsArguments_PairsParamsArguments()
     {
         var syntacticArguments = SyntaxFactory.AttributeArgumentList(SyntaxFactory.SeparatedList([
             SyntaxFactory.AttributeArgument(SyntaxFactory.ParseExpression("42")),
@@ -300,23 +302,23 @@ public sealed class Handle
         commandMock.Setup(static (command) => command.Data.Parameters).Returns([parameterSymbolMock.Object]);
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
 
-        Target(commandMock.Object);
+        await Target(commandMock.Object, CancellationToken.None);
 
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>(), It.IsAny<CancellationToken>()), Times.Never());
 
-        Fixture.ParamsPairerMock.Verify(PairParamsArgumentExpression(parameterSymbolMock.Object, syntacticArguments.Take(2).ToList()), Times.Once());
-        Fixture.ParamsPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>()), Times.Once());
+        Fixture.ParamsPairerMock.Verify(PairParamsArgumentExpression(parameterSymbolMock.Object, syntacticArguments.Take(2).ToList(), It.IsAny<CancellationToken>()), Times.Once());
+        Fixture.ParamsPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Once());
 
-        Fixture.NormalPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>()), Times.Never());
-        Fixture.DefaultPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>()), Times.Never());
+        Fixture.NormalPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.DefaultPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
-    public void SingleArgumentOfParamsParameters_IsParamsArgument_PairsParamsArgument()
+    public async Task SingleArgumentOfParamsParameters_IsParamsArgument_PairsParamsArgument()
     {
         var syntacticArguments = SyntaxFactory.AttributeArgumentList(SyntaxFactory.SeparatedList([
             SyntaxFactory.AttributeArgument(SyntaxFactory.ParseExpression("42"))
@@ -336,25 +338,25 @@ public sealed class Handle
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
         commandMock.Setup(static (command) => command.Data.SemanticModel).Returns(semanticModel);
 
-        Fixture.ParamsArgumentDistinguisherMock.Setup(IsParamsExpression(parameterSymbolMock.Object, syntacticArguments[0], semanticModel)).Returns(true);
+        Fixture.ParamsArgumentDistinguisherMock.Setup(IsParamsExpression(parameterSymbolMock.Object, syntacticArguments[0], semanticModel, It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
 
-        Target(commandMock.Object);
+        await Target(commandMock.Object, CancellationToken.None);
 
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>(), It.IsAny<CancellationToken>()), Times.Never());
 
-        Fixture.ParamsPairerMock.Verify(PairParamsArgumentExpression(parameterSymbolMock.Object, syntacticArguments), Times.Once());
-        Fixture.ParamsPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>()), Times.Once());
+        Fixture.ParamsPairerMock.Verify(PairParamsArgumentExpression(parameterSymbolMock.Object, syntacticArguments, It.IsAny<CancellationToken>()), Times.Once());
+        Fixture.ParamsPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Once());
 
-        Fixture.NormalPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>()), Times.Never());
-        Fixture.DefaultPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>()), Times.Never());
+        Fixture.NormalPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.DefaultPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
-    public void SingleArgumentOfParamsParameter_IsNotParamsArgument_PairsNormalArgument()
+    public async Task SingleArgumentOfParamsParameter_IsNotParamsArgument_PairsNormalArgument()
     {
         var syntacticArguments = SyntaxFactory.AttributeArgumentList(SyntaxFactory.SeparatedList([
             SyntaxFactory.AttributeArgument(SyntaxFactory.ParseExpression("42"))
@@ -374,29 +376,30 @@ public sealed class Handle
         commandMock.Setup(static (command) => command.Data.SyntacticArguments).Returns(syntacticArguments);
         commandMock.Setup(static (command) => command.Data.SemanticModel).Returns(semanticModel);
 
-        Fixture.ParamsArgumentDistinguisherMock.Setup(IsParamsExpression(parameterSymbolMock.Object, syntacticArguments[0], semanticModel)).Returns(false);
+        Fixture.ParamsArgumentDistinguisherMock.Setup(IsParamsExpression(parameterSymbolMock.Object, syntacticArguments[0], semanticModel, It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
-        Target(commandMock.Object);
+        await Target(commandMock.Object, CancellationToken.None);
 
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>()), Times.Never());
-        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.MissingRequiredArgument.Handle(It.IsAny<IHandleMissingRequiredArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.IsAny<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.UnrecognizedLabeledArgument.Handle(It.IsAny<IHandleUnrecognizedLabeledArgumentCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateParameterNames.Handle(It.IsAny<IHandleDuplicateParameterNamesCommand>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.ErrorHandlerMock.Verify(static (handler) => handler.DuplicateArguments.Handle(It.IsAny<IHandleDuplicateArgumentsCommand>(), It.IsAny<CancellationToken>()), Times.Never());
 
-        Fixture.NormalPairerMock.Verify(PairNormalArgumentExpression(parameterSymbolMock.Object, syntacticArguments[0]), Times.Once());
-        Fixture.NormalPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>()), Times.Once());
+        Fixture.NormalPairerMock.Verify(PairNormalArgumentExpression(parameterSymbolMock.Object, syntacticArguments[0], It.IsAny<CancellationToken>()), Times.Once());
+        Fixture.NormalPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Once());
 
-        Fixture.ParamsPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>()), Times.Never());
-        Fixture.DefaultPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>()), Times.Never());
+        Fixture.ParamsPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Never());
+        Fixture.DefaultPairerMock.Verify(static (handler) => handler.Handle(It.IsAny<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>(), It.IsAny<CancellationToken>()), Times.Never());
     }
 
-    private static Expression<Func<IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool>, bool>> IsParamsExpression(
+    private static Expression<Func<IQueryHandler<IIsCSharpAttributeConstructorArgumentParamsQuery, bool>, Task<bool>>> IsParamsExpression(
         IParameterSymbol parameter,
         AttributeArgumentSyntax argument,
-        SemanticModel semanticModel)
+        SemanticModel semanticModel,
+        CancellationToken cancellationToken)
     {
-        return (handler) => handler.Handle(It.Is(MatchIsParamsQuery(parameter, argument, semanticModel)));
+        return (handler) => handler.Handle(It.Is(MatchIsParamsQuery(parameter, argument, semanticModel)), cancellationToken);
     }
 
     private static Expression<Func<IIsCSharpAttributeConstructorArgumentParamsQuery, bool>> MatchIsParamsQuery(
@@ -407,11 +410,12 @@ public sealed class Handle
         return (query) => ReferenceEquals(query.Parameter, parameter) && ReferenceEquals(query.SyntacticArgument, argument) && ReferenceEquals(query.SemanticModel, semanticModel);
     }
 
-    private static Expression<Action<ICommandHandler<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>>> PairNormalArgumentExpression(
+    private static Expression<Func<ICommandHandler<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>>, Task>> PairNormalArgumentExpression(
         IParameterSymbol parameterSymbol,
-        AttributeArgumentSyntax syntacticArgument)
+        AttributeArgumentSyntax syntacticArgument,
+        CancellationToken cancellationToken)
     {
-        return (handler) => handler.Handle(It.Is(MatchPairNormalArgumentCommand(parameterSymbol, syntacticArgument)));
+        return (handler) => handler.Handle(It.Is(MatchPairNormalArgumentCommand(parameterSymbol, syntacticArgument)), cancellationToken);
     }
 
     private static Expression<Func<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>, bool>> MatchPairNormalArgumentCommand(
@@ -421,11 +425,12 @@ public sealed class Handle
         return (command) => MatchParameter(parameterSymbol, command.Parameter) && MatchNormalArgumentData(syntacticArgument, command.ArgumentData);
     }
 
-    private static Expression<Action<ICommandHandler<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>>> PairParamsArgumentExpression(
+    private static Expression<Func<ICommandHandler<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>>, Task>> PairParamsArgumentExpression(
         IParameterSymbol parameterSymbol,
-        IReadOnlyList<AttributeArgumentSyntax> syntacticArguments)
+        IReadOnlyList<AttributeArgumentSyntax> syntacticArguments,
+        CancellationToken cancellationToken)
     {
-        return (handler) => handler.Handle(It.Is(MatchPairParamsArgumentCommand(parameterSymbol, syntacticArguments)));
+        return (handler) => handler.Handle(It.Is(MatchPairParamsArgumentCommand(parameterSymbol, syntacticArguments)), cancellationToken);
     }
 
     private static Expression<Func<IPairArgumentCommand<IMethodParameter, IParamsCSharpAttributeConstructorArgumentData>, bool>> MatchPairParamsArgumentCommand(
@@ -435,10 +440,11 @@ public sealed class Handle
         return (command) => MatchParameter(parameterSymbol, command.Parameter) && MatchParamsArgumentData(syntacticArguments, command.ArgumentData);
     }
 
-    private static Expression<Action<ICommandHandler<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>>> PairDefaultArgumentExpression(
-        IParameterSymbol parameterSymbol)
+    private static Expression<Func<ICommandHandler<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>>, Task>> PairDefaultArgumentExpression(
+        IParameterSymbol parameterSymbol,
+        CancellationToken cancellationToken)
     {
-        return (handler) => handler.Handle(It.Is(MatchPairDefaultArgumentCommand(parameterSymbol)));
+        return (handler) => handler.Handle(It.Is(MatchPairDefaultArgumentCommand(parameterSymbol)), cancellationToken);
     }
 
     private static Expression<Func<IPairArgumentCommand<IMethodParameter, IDefaultCSharpAttributeConstructorArgumentData>, bool>> MatchPairDefaultArgumentCommand(
@@ -447,10 +453,11 @@ public sealed class Handle
         return (command) => MatchParameter(parameterSymbol, command.Parameter);
     }
 
-    private static Expression<Action<ICSharpAttributeConstructorAssociatorErrorHandler>> HandleMissingRequiredArgumentExpression(
-        IParameterSymbol parameterSymbol)
+    private static Expression<Func<ICSharpAttributeConstructorAssociatorErrorHandler, Task>> HandleMissingRequiredArgumentExpression(
+        IParameterSymbol parameterSymbol,
+        CancellationToken cancellationToken)
     {
-        return (handler) => handler.MissingRequiredArgument.Handle(It.Is(MatchHandleMissingRequiredArgumentCommand(parameterSymbol)));
+        return (handler) => handler.MissingRequiredArgument.Handle(It.Is(MatchHandleMissingRequiredArgumentCommand(parameterSymbol)), cancellationToken);
     }
 
     private static Expression<Func<IHandleMissingRequiredArgumentCommand, bool>> MatchHandleMissingRequiredArgumentCommand(
@@ -459,10 +466,11 @@ public sealed class Handle
         return (command) => MatchParameter(parameterSymbol, command.Parameter);
     }
 
-    private static Expression<Action<ICSharpAttributeConstructorAssociatorErrorHandler>> HandleOutOfOrderLabeledArgumentFollowedByUnlabeledExpression(
-        AttributeArgumentSyntax syntacticUnlabeledArgument)
+    private static Expression<Func<ICSharpAttributeConstructorAssociatorErrorHandler, Task>> HandleOutOfOrderLabeledArgumentFollowedByUnlabeledExpression(
+        AttributeArgumentSyntax syntacticUnlabeledArgument,
+        CancellationToken cancellationToken)
     {
-        return (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.Is(MatchHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand(syntacticUnlabeledArgument)));
+        return (handler) => handler.OutOfOrderLabeledArgumentFollowedByUnlabeled.Handle(It.Is(MatchHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand(syntacticUnlabeledArgument)), cancellationToken);
     }
 
     private static Expression<Func<IHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand, bool>> MatchHandleOutOfOrderLabeledArgumentFollowedByUnlabeledCommand(
@@ -471,10 +479,11 @@ public sealed class Handle
         return (command) => Equals(syntacticUnlabeledArgument, command.SyntacticUnlabeledArgument);
     }
 
-    private static Expression<Action<ICSharpAttributeConstructorAssociatorErrorHandler>> HandleUnrecognizedLabeledArgumentExpression(
-        AttributeArgumentSyntax syntacticArgument)
+    private static Expression<Func<ICSharpAttributeConstructorAssociatorErrorHandler, Task>> HandleUnrecognizedLabeledArgumentExpression(
+        AttributeArgumentSyntax syntacticArgument,
+        CancellationToken cancellationToken)
     {
-        return (handler) => handler.UnrecognizedLabeledArgument.Handle(It.Is(MatchHandleUnrecognizedLabeledArgumentCommand(syntacticArgument)));
+        return (handler) => handler.UnrecognizedLabeledArgument.Handle(It.Is(MatchHandleUnrecognizedLabeledArgumentCommand(syntacticArgument)), cancellationToken);
     }
 
     private static Expression<Func<IHandleUnrecognizedLabeledArgumentCommand, bool>> MatchHandleUnrecognizedLabeledArgumentCommand(
@@ -483,10 +492,11 @@ public sealed class Handle
         return (command) => Equals(syntacticArgument, command.SyntacticArgument);
     }
 
-    private static Expression<Action<ICSharpAttributeConstructorAssociatorErrorHandler>> HandleDuplicateParameterNamesExpression(
-        string parameterName)
+    private static Expression<Func<ICSharpAttributeConstructorAssociatorErrorHandler, Task>> HandleDuplicateParameterNamesExpression(
+        string parameterName,
+        CancellationToken cancellationToken)
     {
-        return (handler) => handler.DuplicateParameterNames.Handle(It.Is(MatchHandleDuplicateParameterNamesCommand(parameterName)));
+        return (handler) => handler.DuplicateParameterNames.Handle(It.Is(MatchHandleDuplicateParameterNamesCommand(parameterName)), cancellationToken);
     }
 
     private static Expression<Func<IHandleDuplicateParameterNamesCommand, bool>> MatchHandleDuplicateParameterNamesCommand(
@@ -495,11 +505,12 @@ public sealed class Handle
         return (command) => Equals(parameterName, command.ParameterName);
     }
 
-    private static Expression<Action<ICSharpAttributeConstructorAssociatorErrorHandler>> HandleDuplicateArgumentsExpression(
+    private static Expression<Func<ICSharpAttributeConstructorAssociatorErrorHandler, Task>> HandleDuplicateArgumentsExpression(
         IParameterSymbol parameterSymbol,
-        AttributeArgumentSyntax syntacticArgument)
+        AttributeArgumentSyntax syntacticArgument,
+        CancellationToken cancellationToken)
     {
-        return (handler) => handler.DuplicateArguments.Handle(It.Is(MatchHandleDuplicateArgumentsCommand(parameterSymbol, syntacticArgument)));
+        return (handler) => handler.DuplicateArguments.Handle(It.Is(MatchHandleDuplicateArgumentsCommand(parameterSymbol, syntacticArgument)), cancellationToken);
     }
 
     private static Expression<Func<IHandleDuplicateArgumentsCommand, bool>> MatchHandleDuplicateArgumentsCommand(
@@ -530,9 +541,10 @@ public sealed class Handle
         return Enumerable.SequenceEqual(syntacticArguments, argumentData.SyntacticArguments);
     }
 
-    private void Target(
-        IAssociateArgumentsCommand<IAssociateCSharpAttributeConstructorArgumentsData> command)
+    private async Task Target(
+        IAssociateArgumentsCommand<IAssociateCSharpAttributeConstructorArgumentsData> command,
+        CancellationToken cancellationToken)
     {
-        Fixture.Sut.Handle(command);
+        await Fixture.Sut.Handle(command, cancellationToken);
     }
 }
