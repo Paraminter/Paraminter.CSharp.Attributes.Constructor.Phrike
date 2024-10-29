@@ -37,6 +37,6 @@ public sealed class CSharpAttributeConstructorParamsArgumentDistinguisher
 
         var expressedType = query.SemanticModel.GetTypeInfo(query.SyntacticArgument.Expression);
 
-        return await Task.FromResult(SymbolEqualityComparer.Default.Equals(expressedType.ConvertedType, arrayType.ElementType));
+        return await Task.FromResult(SymbolEqualityComparer.Default.Equals(expressedType.ConvertedType, arrayType.ElementType)).ConfigureAwait(false);
     }
 }
