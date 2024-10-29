@@ -63,7 +63,7 @@ public sealed class CSharpAttributeConstructorAssociator
             throw new ArgumentNullException(nameof(command));
         }
 
-        await Associator.Associate(NormalPairer, ParamsPairer, DefaultPairer, ParamsArgumentDistinguisher, ErrorHandler, command, cancellationToken);
+        await Associator.Associate(NormalPairer, ParamsPairer, DefaultPairer, ParamsArgumentDistinguisher, ErrorHandler, command, cancellationToken).ConfigureAwait(false);
     }
 
     private sealed class Associator
@@ -79,7 +79,7 @@ public sealed class CSharpAttributeConstructorAssociator
         {
             var associator = new Associator(normalPairer, paramsPairer, defaultPairer, paramsArgumentDistinguisher, errorHandler, command, cancellationToken);
 
-            await associator.Associate();
+            await associator.Associate().ConfigureAwait(false);
         }
 
         private readonly ICommandHandler<IPairArgumentCommand<IMethodParameter, INormalCSharpAttributeConstructorArgumentData>> NormalPairer;
