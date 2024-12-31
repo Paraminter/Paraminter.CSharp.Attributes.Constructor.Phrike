@@ -7,7 +7,6 @@ using Paraminter.Associating.Commands;
 using Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Errors;
 using Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Models;
 using Paraminter.Associating.CSharp.Attributes.Constructor.Phrike.Queries;
-using Paraminter.Cqs;
 using Paraminter.Pairing.Commands;
 using Paraminter.Parameters.Method.Models;
 
